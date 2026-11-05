@@ -442,12 +442,153 @@ body.pres .dots-nav{display:none}
 .citebox p{margin:8px 0 12px;font-size:.93rem;color:#D4DDF5;max-width:none;padding-left:2.2em;text-indent:-2.2em;word-break:break-word}
 .tbtn[data-busy="1"]{opacity:.6}
 @media(max-width:620px){#presBtn{display:none}}
-</style>
 
+/* ===== v6 ===== */
+.t-doc{--c:#9FB4FF;--c2:#6C8CFF}.t-speed{--c:#FF7AC8;--c2:#FF4D8D}
+.acc{border:1px solid rgba(150,170,255,.24);border-radius:14px;background:rgba(15,24,54,.6);margin:10px 0;overflow:hidden;transition:border-color .2s,background .2s}
+.acc:hover{border-color:rgba(94,224,255,.5)}
+.acc[open]{background:rgba(22,34,74,.62);border-color:rgba(94,224,255,.42)}
+.acc>summary,.tl-item>summary,.gl-it>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:12px;padding:13px 16px;font:600 .97rem var(--font-display);color:var(--fg)}
+.acc>summary::-webkit-details-marker,.tl-item>summary::-webkit-details-marker,.gl-it>summary::-webkit-details-marker{display:none}
+.acc>summary:focus-visible,.tl-item>summary:focus-visible,.gl-it>summary:focus-visible{outline:2px solid var(--accent);outline-offset:-2px;border-radius:12px}
+.acc>summary>span:first-child{flex:1}
+.pm-i{position:relative;flex:none;width:26px;height:26px;border-radius:50%;border:1.5px solid var(--accent);transition:transform .3s,background .2s}
+.pm-i::before,.pm-i::after{content:"";position:absolute;left:50%;top:50%;width:11px;height:2px;margin:-1px 0 0 -5.5px;background:var(--accent);border-radius:2px}
+.pm-i::after{transform:rotate(90deg)}
+details[open]>summary .pm-i{transform:rotate(45deg);background:rgba(94,224,255,.14)}
+.acc-b{padding:2px 18px 16px;animation:accIn .32s ease both}
+@keyframes accIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+.acc-b>:first-child{margin-top:4px}
+.acc .pc{margin-top:4px}
+.acc-bar{display:flex;gap:10px;flex-wrap:wrap;margin:0 0 16px}
+.ch-vis .acc{margin-top:14px}
+.ch-vis .acc .sheet{margin:0}
+/* timeline */
+.tl-item{padding:0;max-width:820px}
+.tl-item>summary{padding:16px 20px;align-items:center}
+.tl-item .yr{min-width:78px}
+.tl-ic{flex:none;width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:color-mix(in srgb,var(--c) 18%,transparent);border:1px solid color-mix(in srgb,var(--c) 45%,transparent)}
+.tl-ic svg{width:22px;height:22px;stroke:var(--c);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.tl-t{flex:1;min-width:0;display:grid;gap:2px}
+.tl-t b{font:600 1.04rem var(--font-display)}
+.tl-t em{font-style:normal;font-size:.9rem;color:#B9C6EA}
+.tl-item .acc-b{padding:0 20px 18px 20px}
+.tl-item .acc-b p{margin:0 0 10px;font-size:.95rem;color:#D3DCF4}
+.tl-src{font-size:.85rem;color:var(--accent);text-decoration:none}
+.tl-src:hover{text-decoration:underline}
+@media(max-width:620px){.tl-item>summary{flex-wrap:wrap;gap:8px 10px}.tl-ic{display:none}.tl-t{flex:1 1 100%;order:3}.tl-item .yr{min-width:0}.tl-item .pm-i{margin-left:auto}}
+/* glossary */
+.gl-tools{display:grid;gap:12px;margin:14px 0 6px}
+.chiprow{display:flex;gap:8px;flex-wrap:wrap}
+.fchip{padding:7px 13px;border-radius:999px;border:1px solid rgba(150,170,255,.3);background:rgba(255,255,255,.04);color:var(--fg);font:500 .84rem var(--font-body);cursor:pointer;transition:background .2s,border-color .2s}
+.fchip:hover{border-color:var(--accent)}
+.fchip[aria-pressed="true"]{background:linear-gradient(135deg,var(--accent),var(--accent-2));color:var(--on-accent);border-color:transparent;font-weight:700}
+.azrow .fchip{padding:5px 0;width:32px;text-align:center;font-family:var(--font-mono)}
+.fchip:disabled{opacity:.3;cursor:default}
+.gl-list{align-items:start}
+.gl-list .gl-it{padding:0;border-radius:14px;background:rgba(15,24,54,.74);border:1px solid rgba(150,170,255,.2);overflow:hidden}
+.gl-list .gl-it[open]{border-color:rgba(94,224,255,.45)}
+.gl-it>summary{padding:12px 14px;align-items:flex-start}
+.gl-it .gt{flex:1;display:grid;gap:3px;min-width:0}
+.gl-it .gt b{font:600 1rem var(--font-display);color:var(--accent)}
+.gl-it .gt span{font-size:.88rem;color:#CBD6F2;font-weight:400;font-family:var(--font-body)}
+.gl-it .gl-long{margin:0;padding:0 16px 14px;font-size:.92rem;color:#E0E7FA;animation:accIn .3s ease both}
+.gl-it .gl-cat{display:inline-block;margin:0 16px 14px;font:500 .72rem var(--font-mono);text-transform:uppercase;letter-spacing:.08em;color:var(--accent-2)}
+.gl-count{font:500 .8rem var(--font-mono);color:var(--muted)}
+/* hero stats */
+.stats{display:flex;gap:clamp(16px,3vw,38px);flex-wrap:wrap;margin-top:30px}
+.stat{display:grid;gap:2px}
+.stat b{font:700 clamp(1.7rem,4vw,2.5rem) var(--font-display);background:linear-gradient(95deg,var(--accent),var(--accent-2));-webkit-background-clip:text;background-clip:text;color:transparent;line-height:1.1;font-variant-numeric:tabular-nums}
+.stat span{font-size:.82rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+/* cableado */
+.cab-grid{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:clamp(20px,3vw,40px);align-items:start;margin-top:8px}
+@media(max-width:900px){.cab-grid{grid-template-columns:minmax(0,1fr)}}
+.svgbox{padding:14px;border-radius:20px;background:rgba(15,24,54,.78);border:1px solid rgba(150,170,255,.22)}
+.svgbox svg{width:100%;height:auto;display:block;border-radius:12px;background:radial-gradient(circle at 1px 1px,rgba(150,170,255,.16) 1px,transparent 1.3px) 0 0/16px 16px,rgba(7,11,26,.5)}
+.svgbox figcaption{margin-top:10px;font-size:.88rem;color:var(--muted);text-align:center}
+figure.svgbox{margin:0}
+.sv-box{fill:rgba(22,34,74,.95);stroke:#5E73BA;stroke-width:1.5}
+.sv-fl{fill:rgba(255,255,255,.025);stroke:#27376B;stroke-width:1}
+.sv-hz{stroke:#5EE0FF;stroke-width:1.8;fill:none}
+.sv-bb{stroke:#FFD84D;stroke-width:4;fill:none;stroke-linecap:round}
+.sv-isp{stroke:#B38BFF;stroke-width:3;fill:none}
+.sv-tx{fill:#C9D4F0;font:12px Inter,system-ui,sans-serif}
+.sv-tx.b{font-weight:600;fill:#F1F4FF}
+.sv-pc{fill:#16224A;stroke:#5EE0FF;stroke-width:1.5}
+.sv-ld{stroke:#7E90CC;stroke-width:1;fill:none}
+.sv-port{fill:#5EE0FF}.sv-led{fill:#59F0A0}
+.tblwrap{overflow-x:auto;border-radius:16px;border:1px solid rgba(150,170,255,.22);margin:12px 0}
+table.cat{width:100%;border-collapse:collapse;min-width:520px;background:rgba(15,24,54,.7)}
+table.cat th,table.cat td{padding:12px 16px;text-align:left;font-size:.92rem;border-bottom:1px solid rgba(150,170,255,.14)}
+table.cat th{font:600 .78rem var(--font-mono);text-transform:uppercase;letter-spacing:.08em;color:var(--accent);background:rgba(94,224,255,.07)}
+table.cat tr:last-child td{border-bottom:0}
+.t568{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin:14px 0}
+@media(max-width:700px){.t568{grid-template-columns:minmax(0,1fr)}}
+.t568 .end{padding:16px;border-radius:18px;background:rgba(15,24,54,.78);border:1px solid rgba(150,170,255,.22)}
+.t568 h4{margin:0 0 10px}
+.pins{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:5px;margin-top:12px}
+.pin{display:grid;gap:5px;justify-items:center;font:500 .7rem var(--font-mono);color:var(--muted)}
+.pin i{display:block;width:100%;max-width:34px;height:64px;border-radius:5px;border:1px solid rgba(255,255,255,.35);transition:background .3s}
+.pin small{font-size:.62rem;text-align:center;line-height:1.15;color:#B9C6EA;min-height:2.4em}
+@media(max-width:520px){.pin small{display:none}}
+.t568res{padding:12px 16px;border-radius:12px;background:rgba(94,224,255,.09);border:1px solid rgba(94,224,255,.35);font-size:.94rem}
+.gal{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:12px}
+@media(max-width:900px){.gal{grid-template-columns:minmax(0,1fr)}}
+/* design + game */
+.dz{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:clamp(18px,3vw,36px);align-items:start}
+@media(max-width:860px){.dz{grid-template-columns:minmax(0,1fr)}}
+.dz .card,.gm .card{padding:clamp(16px,2.5vw,26px)}
+.dz .field{display:grid;grid-template-columns:minmax(0,1fr);gap:6px;margin-bottom:16px}
+.dz .field label{font-weight:600;font-size:.94rem}
+.dz input[type=range]{width:100%;accent-color:var(--accent)}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:14px 0}
+.tile{padding:12px 14px;border-radius:14px;background:rgba(94,224,255,.07);border:1px solid rgba(94,224,255,.25)}
+.tile b{display:block;font:700 1.15rem var(--font-display);color:var(--fg);overflow-wrap:anywhere}
+.tile span{font-size:.78rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.dz .why{padding:12px 16px;border-left:3px solid var(--accent);background:rgba(255,255,255,.04);border-radius:0 12px 12px 0;margin:10px 0}
+.dz .note,.gm .note{font-size:.84rem;color:var(--muted)}
+.gm{margin-top:36px}
+.gm svg{width:100%;max-width:520px;height:auto;display:block;margin:12px auto;touch-action:none;border-radius:16px;background:radial-gradient(circle at 1px 1px,rgba(150,170,255,.16) 1px,transparent 1.3px) 0 0/16px 16px,rgba(7,11,26,.5);user-select:none}
+.gm .gnode{cursor:pointer}
+.gm .gnode circle{fill:#16224A;stroke:#5EE0FF;stroke-width:2.5;transition:fill .2s,stroke .2s}
+.gm .gnode.sel circle{fill:#5EE0FF}
+.gm .gnode text{fill:#F1F4FF;font:600 13px Inter,system-ui,sans-serif;pointer-events:none}
+.gm .gnode.sel text{fill:#04202B}
+.gm .glink{stroke:#B38BFF;stroke-width:3;stroke-linecap:round}
+.gm .ghit{stroke:transparent;stroke-width:16;cursor:pointer}
+.gm .gmsg{min-height:2.6em;padding:10px 14px;border-radius:12px;background:rgba(255,255,255,.05);font-size:.94rem}
+.gm .gmsg.ok{background:rgba(89,240,160,.12);border:1px solid rgba(89,240,160,.5)}
+/* faq */
+.faq-list .acc>summary{font-size:1rem}
+.faq-list .acc-b p{margin:0;color:#D3DCF4}
+/* refs groups */
+#refWrap .acc>.acc-b{padding-top:10px}
+#refWrap .refs{margin-top:0}
+/* search overlay */
+.kov{position:fixed;inset:0;z-index:200;background:rgba(4,8,22,.72);backdrop-filter:blur(6px);display:grid;place-items:start center;padding:12vh 16px 16px}
+.kov[hidden]{display:none}
+.kbox{width:min(640px,100%);border-radius:18px;background:var(--surface);border:1px solid var(--line-strong);box-shadow:0 30px 80px -20px #000;overflow:hidden}
+.kbox input{width:100%;padding:18px 20px;border:0;border-bottom:1px solid var(--line);background:transparent;color:var(--fg);font:500 1.05rem var(--font-body);outline:none}
+.kbox ul{list-style:none;margin:0;padding:6px;max-height:50vh;overflow:auto}
+.kbox li{display:flex;gap:10px;align-items:center;padding:10px 12px;border-radius:10px;cursor:pointer}
+.kbox li[aria-selected="true"],.kbox li:hover{background:rgba(94,224,255,.14)}
+.kbox li em{flex:none;font:500 .68rem var(--font-mono);text-transform:uppercase;letter-spacing:.08em;color:var(--accent-2);min-width:74px;font-style:normal}
+.kbox li b{font-weight:600;font-size:.95rem}
+.kbox li small{display:block;color:var(--muted);font-size:.8rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:46ch}
+.kbox .khint{margin:0;padding:10px 16px;font-size:.78rem;color:var(--muted);border-top:1px solid var(--line)}
+#kBtn span{display:none}#kBtn{font-size:1.05rem;padding-inline:12px}.tbtn{white-space:nowrap}
+#cableado h3,.gm h3{margin:0 0 10px}
+.flash{animation:flash 1.6s ease}
+@keyframes flash{0%,60%{box-shadow:0 0 0 3px var(--accent)}100%{box-shadow:0 0 0 0 transparent}}
+body.pres .kov{display:none}
+</style>
 </head>
 <body>
+
+
 <a class="skip" href="#intro" data-i="skip"></a>
 <div id="prog" aria-hidden="true"></div>
+<div class="kov" id="kov" hidden><div class="kbox" role="dialog" aria-modal="true" aria-label="Buscar"><input id="kIn" type="search" autocomplete="off" aria-label="Buscar"><ul id="kRes" role="listbox"></ul><p class="khint" id="kHint"></p></div></div>
 <audio id="bgm" loop preload="none" src="musica.mp3"></audio>
 <nav class="dots-nav" id="dotsNav" data-ia="aDots"></nav>
 <header class="bar">
@@ -456,6 +597,7 @@ body.pres .dots-nav{display:none}
     <a href="#fundamentos" data-i="nFund"></a><a href="#topologias" data-i="nTopo"></a><a href="#simulador" data-i="nSim"></a><a href="#laboratorio" data-i="nLab"></a><a href="#comparativa" data-i="nCmp"></a><a href="#historia" data-i="nHist"></a><a href="#aprende" data-i="nLearn"></a><a href="#fuentes" data-i="nSrc"></a>
   </nav>
   <div class="tools">
+    <button class="tbtn" id="kBtn" type="button" data-ia="aK">&#8981; <span data-i="kBtn"></span></button>
     <button class="tbtn" id="presBtn" type="button" data-i="presBtn"></button>
     <button class="tbtn" id="musBtn" type="button" data-ia="aMus" aria-pressed="false">♫ OFF</button>
     <button class="tbtn" id="sndBtn" type="button" data-ia="aSnd" aria-pressed="false">♪ OFF</button>
@@ -483,6 +625,7 @@ body.pres .dots-nav{display:none}
         <a class="chip t-mesh" href="#mesh"><i></i><span data-i="tMesh"></span></a>
         <a class="chip t-tree" href="#tree"><i></i><span data-i="tTree"></span></a>
       </div>
+      <div class="stats" id="stats"></div>
     </div>
   </div>
 
@@ -519,6 +662,7 @@ body.pres .dots-nav{display:none}
     <div class="gear" id="gearGrid"></div>
   </section>
 
+  <div class="acc-bar" data-for="#chapters" style="justify-content:flex-end"></div>
   <div id="topologias"><div id="chapters"></div></div>
 
   <section id="simulador">
@@ -605,8 +749,38 @@ body.pres .dots-nav{display:none}
     <div class="cards" id="hybCards"></div>
   </section>
 
+  <section id="cableado">
+    <div class="sec-head"><span class="label" data-i="nCable"></span><h2 data-i="cableTitle"></h2><p data-i="cableP1"></p><p data-i="cableP2"></p></div>
+    <div class="cab-grid">
+      <figure class="svgbox"><div id="cabSvg"></div></figure>
+      <div><h3 data-i="subsTitle"></h3><div class="acc-bar" data-for="#cabSubs"></div><div id="cabSubs"></div></div>
+    </div>
+    <h3 style="margin-top:38px" data-i="catTitle"></h3>
+    <div class="tblwrap" id="catTbl"></div>
+    <p class="note" data-i="catNote"></p>
+    <h3 style="margin-top:38px" data-i="t568Title"></h3>
+    <p data-i="t568Intro"></p>
+    <div class="t568" id="t568"></div>
+    <h3 style="margin-top:38px" data-i="galTitle"></h3>
+    <div class="gal">
+      <figure class="svgbox"><div id="galRack"></div><figcaption data-i="galRack"></figcaption></figure>
+      <figure class="svgbox"><div id="galUtp"></div><figcaption data-i="galUtp"></figcaption></figure>
+      <figure class="svgbox"><div id="galDc"></div><figcaption data-i="galDc"></figcaption></figure>
+    </div>
+  </section>
+
+  <section id="disena">
+    <div class="sec-head"><span class="label" data-i="nDesign"></span><h2 data-i="dsTitle"></h2><p data-i="dsSub"></p></div>
+    <div class="dz"><div class="card"><div id="dsForm"></div></div><div class="card"><div id="dsOut"></div></div></div>
+    <div class="gm">
+      <div class="sec-head"><h3 data-i="gmTitle"></h3><p data-i="gmSub"></p></div>
+      <div class="card" id="gmBody"></div>
+    </div>
+  </section>
+
   <section id="historia">
     <div class="sec-head"><span class="label" data-i="nHist"></span><h2 data-i="histTitle"></h2><p data-i="histIntro"></p></div>
+    <div class="acc-bar" data-for="#tlList"></div>
     <div class="tl" id="tlList"></div>
   </section>
 
@@ -619,9 +793,17 @@ body.pres .dots-nav{display:none}
   </section>
 
   <section id="glosario">
-    <div class="sec-head"><span class="label" data-i="nGloss"></span><h2 data-i="glTitle"></h2></div>
+    <div class="sec-head"><span class="label" data-i="nGloss"></span><h2 data-i="glTitle"></h2><p data-i="glSub"></p></div>
     <input type="search" id="glQ" autocomplete="off" aria-label="Buscar / Search">
-    <dl class="gl-list" id="glList"></dl>
+    <div class="gl-tools" id="glTools"></div>
+    <div class="acc-bar" data-for="#glList"></div>
+    <div class="gl-list" id="glList"></div>
+  </section>
+
+  <section id="faq">
+    <div class="sec-head"><span class="label" data-i="nFaq"></span><h2 data-i="faqTitle"></h2><p data-i="faqIntro"></p></div>
+    <div class="acc-bar" data-for="#faqList"></div>
+    <div class="faq-list" id="faqList"></div>
   </section>
 
   <section id="conclusiones">
@@ -631,7 +813,8 @@ body.pres .dots-nav{display:none}
 
   <section id="fuentes">
     <div class="sec-head"><span class="label" data-i="nSrc"></span><h2 data-i="srcTitle"></h2><p data-i="srcIntro"></p></div>
-    <ul class="refs" id="refList"></ul>
+    <div class="acc-bar" data-for="#refWrap"></div>
+    <div id="refWrap"></div>
     <p class="note" data-i="refNote"></p>
     <div class="card books">
       <h3 data-i="bookTitle"></h3>
@@ -1084,13 +1267,12 @@ function renderChapters(){
     h+='<article class="chapter t-'+ty+(ix%2?" rev":"")+'" id="'+ty+'">'
      +'<div class="ch-vis"><div class="card diagram"><svg id="dg-'+ty+'" viewBox="0 0 400 300" role="img" aria-label="'+d.name+'"></svg>'
      +'<div class="demo" data-dw="'+ty+'"><div class="demo-top"><button type="button" class="btn small" data-demo="'+ty+'">&#9654; '+t.demoPlay+'</button><span class="dstep"></span></div><div class="dprog"></div><p class="dtext">'+t.demoHint+'</p><div class="mac" hidden></div></div>'
-     +'<dl class="sheet">'+lk.map(function(key,j){return '<dt>'+t[key]+'</dt><dd>'+d.sheet[j]+'</dd>'}).join("")+'</dl></div></div>'
+     +ACC(t.accSheet,'<dl class="sheet">'+lk.map(function(key,j){return '<dt>'+t[key]+'</dt><dd>'+d.sheet[j]+'</dd>'}).join("")+'</dl>',false)+'</div></div>'
      +'<div class="ch-txt"><div class="ch-kicker"><i></i><span class="label">'+t["t"+ty.charAt(0).toUpperCase()+ty.slice(1)]+'</span></div>'
      +'<h2>'+d.name+'</h2><p class="ch-tag">'+d.tag+'</p>'
      +'<p>'+d.def+'</p><p><strong>'+t.how+'.</strong> '+d.how+'</p>'
-     +'<div class="pc"><div><h4>'+t.pros+'</h4><ul class="pm pro">'+d.pros.map(function(x){return '<li>'+x+'</li>'}).join("")+'</ul></div>'
-     +'<div><h4>'+t.cons+'</h4><ul class="pm con">'+d.cons.map(function(x){return '<li>'+x+'</li>'}).join("")+'</ul></div></div>'
-     +'<div class="uses"><h4>'+t.uses+'</h4><ul class="us">'+d.uses.map(function(x){return '<li>'+x+'</li>'}).join("")+'</ul></div>'
+     +ACC(t.accPros,'<div class="pc"><div><h4>'+t.pros+'</h4><ul class="pm pro">'+d.pros.map(function(x){return '<li>'+x+'</li>'}).join("")+'</ul></div><div><h4>'+t.cons+'</h4><ul class="pm con">'+d.cons.map(function(x){return '<li>'+x+'</li>'}).join("")+'</ul></div></div>',true)
+     +ACC(t.accUses,'<ul class="us">'+d.uses.map(function(x){return '<li>'+x+'</li>'}).join("")+'</ul>',false)
      +'<div class="row">'+(MORE[lang][ty]||[[t.more,d.link]]).map(function(m){return '<a class="btn" href="'+m[1]+'" target="_blank" rel="noopener noreferrer">'+t.more+': '+m[0]+' &#8599;</a>'}).join("")+'</div></div></article>';
   });
   host.innerHTML=h;
@@ -1360,7 +1542,6 @@ function renderStatic(){
   $("#crit").innerHTML=t.crit.map(function(c,i){return '<div class="ccard rv t-'+TYPES[i]+'"><h3>'+c[0]+'</h3><p>'+c[1]+'</p></div>'}).join("");
   $("#hybCards").innerHTML=t.hyb.map(function(c,i){return '<div class="card hc tilt t-'+TYPES[i]+'"><h3>'+c[0]+'</h3><p>'+c[1]+'</p></div>'}).join("");
   $("#conList").innerHTML=t.con.map(function(c){return '<li><strong>'+c[0]+'</strong>'+c[1]+'</li>'}).join("");
-  $("#refList").innerHTML=t.refs.map(function(r){return '<li><div class="rt"><b>'+r[0]+'</b><span>'+r[1]+'</span></div><a class="btn small" href="'+r[2]+'" target="_blank" rel="noopener noreferrer">'+t.open+' &#8599;</a></li>'}).join("");
   document.documentElement.lang=lang;
 }
 function applyLang(){
@@ -1414,15 +1595,6 @@ function renderCred(){
   var t=L();
   $("#citeTxt").innerHTML=citeText().replace("Topologías de red físicas","<i>Topologías de red físicas</i>");
   $("#credList").innerHTML=t.cred.map(function(c){return '<div><dt>'+c[0]+'</dt><dd>'+c[1]+'</dd></div>'}).join("");
-}
-function renderTimeline(){
-  var t=L();
-  $("#tlList").innerHTML=t.timeline.map(function(e){return '<div class="tl-item rv t-'+e[3]+'"><span class="yr">'+e[0]+'</span><h3>'+e[1]+'</h3><p>'+e[2]+'</p></div>'}).join("");
-}
-function renderGlossary(){
-  var t=L(),q=($("#glQ").value||"").trim().toLowerCase();
-  var items=t.gl.filter(function(g){return !q||g[0].toLowerCase().indexOf(q)>=0||g[1].toLowerCase().indexOf(q)>=0});
-  $("#glList").innerHTML=items.length?items.map(function(g){return '<div><dt>'+g[0]+'</dt><dd>'+g[1]+'</dd></div>'}).join(""):'<p>'+t.glNone+'</p>';
 }
 function glossify(){
   var t=L(),map={},alts=[];
@@ -1666,8 +1838,8 @@ function wireLearn(){
 }
 
 /* ---------- navigation: progress, dots, presentation mode ---------- */
-var SECS=[["inicio","brand"],["intro","nIntro"],["fundamentos","nFund"],["medios","nMedia"],["topologias","nTopo"],["simulador","nSim"],["laboratorio","nLab"],["comparativa","nCmp"],["hibridas","nHyb"],["historia","nHist"],["aprende","nLearn"],["glosario","nGloss"],["conclusiones","conLabel"],["fuentes","nSrc"]];
-var STOPS=["inicio","intro","fundamentos","medios","bus","star","ring","mesh","tree","simulador","laboratorio","comparativa","hibridas","historia","aprende","glosario","conclusiones","fuentes"];
+var SECS=[["inicio","brand"],["intro","nIntro"],["fundamentos","nFund"],["medios","nMedia"],["topologias","nTopo"],["simulador","nSim"],["laboratorio","nLab"],["comparativa","nCmp"],["hibridas","nHyb"],["cableado","nCable"],["disena","nDesign"],["historia","nHist"],["aprende","nLearn"],["glosario","nGloss"],["faq","nFaq"],["conclusiones","conLabel"],["fuentes","nSrc"]];
+var STOPS=["inicio","intro","fundamentos","medios","bus","star","ring","mesh","tree","simulador","laboratorio","comparativa","hibridas","cableado","disena","historia","aprende","glosario","faq","conclusiones","fuentes"];
 var PRES={on:false,i:0};
 function renderDots(){
   var t=L();
@@ -1726,10 +1898,10 @@ function wireNav(){
 }
 function renderNew(){
   demoStop();
-  renderIntro();renderCred();renderTimeline();renderGlossary();renderAB();renderCost();renderRel();renderRec();renderQuiz();renderDots();glossify();sndBtn();
+  renderIntro();renderCred();renderTimeline();renderGlossary();renderV6();renderAB();renderCost();renderRel();renderRec();renderQuiz();renderDots();glossify();sndBtn();
   $$(".demo").forEach(function(box){var ty=box.getAttribute("data-dw");$("[data-demo]",box).textContent="▶ "+L().demoPlay;$(".dtext",box).textContent=L().demoHint});
   if(PRES.on)hudUpdate();
-  $("#glQ").placeholder=L().glSearch;
+  $("#glQ").placeholder=L().glSearch;$("#kIn").placeholder=L().kPh;$("#kHint").textContent=L().kHint;
 }
 
 /* ===== v3.1: credits, Spanish sources ===== */
@@ -1806,7 +1978,572 @@ function copyTxt(txt,btn){
 }
 $("#copyCite").addEventListener("click",function(e){copyTxt(citeText(),e.currentTarget)});
 $("#copyLink").addEventListener("click",function(e){copyTxt(location.href.split("#")[0],e.currentTarget)});
-wireCost();wireLearn();wireNav();
+/* ===================== v6 data ===================== */
+Object.assign(I.es,{
+ nCable:"Cableado",nFaq:"Preguntas",nDesign:"Diseña tu red",
+ kBtn:"Buscar",kPh:"Buscar secciones, términos, preguntas…",kHint:"↑ ↓ para moverte · Enter para ir · Esc para cerrar",kNone:"Sin resultados.",aK:"Buscar en la página (Ctrl + K)",
+ kTypes:{sec:"Sección",gl:"Glosario",faq:"Pregunta",hist:"Historia",ref:"Fuente"},
+ stats:[["topologías"],["hitos históricos"],["términos"],["fuentes"]],
+ accOpen:"Expandir todo",accClose:"Contraer todo",
+ accPros:"Ventajas y desventajas",accUses:"Dónde se usa",accSheet:"Ficha técnica",
+ /* cableado */
+ cableTitle:"Cableado estructurado: donde las topologías se hacen realidad",
+ cableP1:"El cableado estructurado es un sistema de cables, conectores y espacios organizado según normas, que sirve a datos, voz y video en un edificio sin depender de los equipos que se conecten. La norma de referencia es ANSI/TIA-568, publicada por primera vez en 1991 como EIA/TIA-568; su revisión actual es ANSI/TIA-568-E, de 2020.",
+ cableP2:"Para este trabajo la clave es esta: en el cableado horizontal la norma usa una topología en estrella, y el troncal une los cuartos de telecomunicaciones de forma jerárquica. El resultado de un edificio completo es una topología en árbol, es decir, una estrella de estrellas.",
+ subsTitle:"Los seis elementos del sistema",
+ subs:[["Área de trabajo","Es donde están los usuarios: computadores, teléfonos IP e impresoras, conectados a la toma de pared con un cable de conexión (patch cord)."],["Cableado horizontal","Une cada toma del área de trabajo con el cuarto de telecomunicaciones de su piso, en topología de estrella. La distancia máxima del enlace permanente es de 90 m, y con los cables de conexión el canal completo llega a 100 m."],["Cableado troncal","Conecta los cuartos de telecomunicaciones, el cuarto de equipos y la acometida entre pisos y entre edificios. Es el backbone del sistema y suele ir en fibra óptica."],["Cuarto de telecomunicaciones","Aloja el rack, el patch panel y los switches de cada piso. Allí termina el cableado horizontal y empieza el troncal."],["Cuarto de equipos","Concentra los equipos principales del edificio: servidores, switches de núcleo y central telefónica."],["Acometida","Es el punto por donde entran al edificio los servicios del proveedor (ISP) y donde se conectan con la red interna."]],
+ svgB:{ts:"Acometida (ISP)",er:"Cuarto de equipos",tr:"Cuarto de telecom.",wa:"Área de trabajo",hz:"Horizontal",bb:"Troncal",f:"Piso"},
+ catTitle:"Categorías de cable de par trenzado",
+ catHead:["Categoría","Frecuencia","Velocidad máxima","Longitud máxima del canal"],
+ catRows:[["Cat 5e","100 MHz","1 Gb/s","100 m"],["Cat 6","250 MHz","1 Gb/s (10 Gb/s solo hasta unos 55 m)","100 m"],["Cat 6A","500 MHz","10 Gb/s","100 m"],["Cat 8","2000 MHz","25 / 40 Gb/s","30 m (con dos conectores)"]],
+ catNote:"Valores de referencia: pueden variar según el fabricante y las condiciones de instalación. La fibra óptica (monomodo y multimodo) se usa cuando la distancia o la velocidad superan lo que permite el cobre.",
+ t568Title:"Código de colores T568A y T568B",
+ t568Intro:"Los dos esquemas de conexión del RJ-45 que define la norma. Si usas el mismo en los dos extremos, el cable es directo; si usas uno distinto en cada extremo, es cruzado.",
+ t568Pin:"Pin",t568Pair:"Par",t568Straight:"Mismo esquema en ambos extremos: cable directo.",t568Cross:"T568A en un extremo y T568B en el otro: cable cruzado.",
+ t568Names:["blanco/verde","verde","blanco/naranja","azul","blanco/azul","naranja","blanco/café","café"],
+ galTitle:"Galería técnica",galRack:"Rack de un cuarto de telecomunicaciones",galUtp:"Corte de un cable UTP",galDc:"Centro de datos con topología spine-leaf",
+ svgR:{pp:"Patch panel",sw:"Switch",org:"Organizador",ups:"UPS",srv:"Servidor"},
+ svgU:{jk:"Chaqueta",sp:"Separador",cu:"Conductor de cobre",pr:"Par trenzado"},
+ svgD:{spine:"Spine (núcleo)",leaf:"Leaf (acceso)"},
+ /* diseña tu red */
+ dsTitle:"Diseña tu red",dsSub:"Cuéntame el edificio y te propongo una topología con cantidades estimadas.",
+ dsFloors:"Pisos",dsPer:"Equipos por piso",dsPrio:"Prioridad",dsPrios:[["Costo","cost"],["Equilibrio","bal"],["Disponibilidad","ha"]],
+ dsRes:"Propuesta",dsTopo:"Topología",dsSw:"Switches de acceso",dsCore:"Switches de núcleo",dsHz:"Cable horizontal",dsBb:"Troncales (enlaces)",dsRack:"Racks",dsCost:"Costo estimado",
+ dsWhy:{cost:"Una estrella por piso con un solo núcleo: es lo más económico y fácil de administrar.",bal:"Árbol de estrellas con un núcleo y un enlace por switch: el punto medio entre costo y orden.",ha:"Árbol con doble núcleo y doble enlace por switch: una malla parcial en el núcleo que evita el punto único de falla."},
+ dsTopoNames:{cost:"Estrella",bal:"Árbol",ha:"Árbol híbrido con malla parcial en el núcleo"},
+ dsNote:"Estimación didáctica: 24 puertos por switch con 20 % de reserva, 30 m promedio por cable horizontal y 20 m por troncal. Los precios unitarios son referenciales (pesos colombianos); el precio del metro de cable sale del estimador de costos.",
+ /* juego */
+ gmTitle:"Arma la topología",gmSub:"Conecta los equipos tocando uno y luego otro, o arrastrando. Toca un cable para quitarlo.",
+ gmGoals:[["Estrella","star"],["Anillo","ring"],["Malla completa","mesh"]],
+ gmCheck:"Comprobar",gmClear:"Limpiar",gmLinks:"cables",
+ gmMsg:{ok:"¡Correcto! La topología está bien armada.",none:"Aún no has conectado nada.",star:function(a,b){return "Estrella: cada equipo debe ir solo al switch central. Faltan "+a+" y sobran "+b+"."},ring:function(a,b){return "Anillo: cada equipo se une a sus dos vecinos formando un círculo. Faltan "+a+" y sobran "+b+"."},mesh:function(a,b){return "Malla completa: todos con todos (15 cables). Faltan "+a+" y sobran "+b+"."}},
+ gmGoalTxt:{star:"Objetivo: conecta los 6 equipos al switch central.",ring:"Objetivo: forma un círculo cerrado, cada equipo con sus dos vecinos.",mesh:"Objetivo: conecta cada equipo con todos los demás."},
+ /* faq */
+ faqTitle:"Preguntas frecuentes",faqIntro:"Respuestas cortas a las dudas más comunes sobre el tema.",
+ faq:[["¿Cuál es la diferencia entre topología física y lógica?","La física es la forma en que se disponen los cables y los equipos; la lógica es el camino que siguen los datos. Una red con hub, por ejemplo, está cableada en estrella pero los datos circulan como en un bus."],["¿Por qué ya casi no se usa el bus?","Porque un solo corte tumba toda la red, es difícil encontrar la falla y el rendimiento cae con más equipos. La estrella con switch resolvió esos tres problemas."],["¿Qué topología conviene en una casa o en una pequeña empresa?","La estrella: un switch o un router central, y un cable (o una señal Wi-Fi) por equipo. Es barata, fácil de ampliar y fácil de diagnosticar."],["¿La malla es siempre mejor por ser más redundante?","No. Una malla completa de n equipos necesita n(n−1)/2 enlaces, así que el costo crece muy rápido. Por eso se usa en el núcleo de la red y no en todas partes."],["¿Qué distancia máxima tiene un cable UTP?","En cableado estructurado, el enlace permanente horizontal llega a 90 m y el canal completo, con los cables de conexión, a 100 m."],["¿Qué diferencia hay entre T568A y T568B?","Solo se intercambian los pares verde y naranja en los pines 1, 2, 3 y 6. Lo importante es usar el mismo esquema en todo el proyecto."],["¿Qué es una topología híbrida?","Es la combinación de dos o más topologías, como un árbol de estrellas con una malla parcial en el núcleo. Casi todas las redes reales son híbridas."],["¿Cómo se relaciona el cableado estructurado con las topologías?","El cableado horizontal se hace en estrella y el troncal une los cuartos de forma jerárquica; el conjunto de un edificio forma un árbol."]],
+ /* historia */
+ histTitle:"Historia hasta 2026",histIntro:"De un memo en 1973 a Ethernet de 1,6 Tb/s en desarrollo. Pulsa cada hito para ver el detalle.",
+ timeline:[
+  ["1973","Nace Ethernet","Metcalfe escribe el memo de Ethernet, con un cable compartido: un bus.","bus","El memo de Robert Metcalfe, del 22 de mayo de 1973, describía una red local con un único cable compartido por todos los equipos. De esa idea salió Ethernet.","bus"],
+  ["1983","Ethernet se estandariza","El comité IEEE 802 aprueba Ethernet como IEEE 802.3.","doc","Con la aprobación del estándar, distintos fabricantes pudieron producir equipos compatibles, lo que impulsó la expansión de las redes locales.","doc"],
+  ["Años 80","Token Ring","IBM impulsa el anillo con testigo, IEEE 802.5.","ring","El testigo circula por el anillo y solo quien lo tiene puede transmitir, así que no hay colisiones. Funcionaba a 4 y 16 Mb/s y, físicamente, se cableaba en estrella con unidades MAU.","ring"],
+  ["1987","FDDI","Estándar ANSI de doble anillo de fibra a 100 Mb/s.","ring","FDDI usa dos anillos de fibra óptica que giran en sentidos opuestos. Si un enlace se corta, la red se reconfigura y sigue operando.","fiber"],
+  ["1990","10BASE-T","Ethernet pasa al par trenzado con un equipo central.","star","Cada equipo se conecta con su propio cable a un hub o switch. Un cable dañado ya no tumba toda la red, y la estrella se impuso en las redes locales.","star"],
+  ["1991","Primera norma de cableado estructurado","Se publica EIA/TIA-568 para edificios comerciales.","doc","Fue la primera versión de la norma que hoy es ANSI/TIA-568. Definió cómo cablear un edificio con independencia de los equipos que se conecten.","doc"],
+  ["1995","Fast Ethernet","Ethernet sube a 100 Mb/s sobre la misma estrella.","tree","Se mantuvo el cableado en estrella con par trenzado y se multiplicó por diez la velocidad.","star"],
+  ["1999","Gigabit sobre cable de cobre","IEEE 802.3ab lleva Ethernet a 1 Gb/s sobre par trenzado.","speed","IEEE 802.3ab se publicó el 26 de julio de 1999. Define 1000BASE-T: 1000 Mb/s sobre cuatro pares de cable de categoría 5.","speed"],
+  ["2006","10 Gigabit sobre cobre","Se ratifica 10GBASE-T.","speed","El 8 de junio de 2006 se aprobó el estándar que lleva 10 Gb/s sobre cable de par trenzado de cuatro pares. La distancia máxima depende de la calidad del cable.","speed"],
+  ["2011","Mallas inalámbricas","IEEE 802.11s lleva la malla al Wi-Fi.","mesh","Los puntos de acceso se conectan entre sí y encuentran por sí mismos la mejor ruta, lo que hoy se ve en los sistemas Wi-Fi mesh domésticos.","wifi"],
+  ["2019","Wi-Fi 6","La Wi-Fi Alliance lanza la certificación de Wi-Fi 6 (802.11ax).","tree","En septiembre de 2019 se lanzó la certificación. Introdujo OFDMA y 1024-QAM para atender a más dispositivos a la vez.","wifi"],
+  ["2024","Wi-Fi 7 y Ethernet de 800 Gb/s","Certificación Wi-Fi 7 y aprobación de IEEE 802.3df.","speed","El 8 de enero de 2024 la Wi-Fi Alliance lanzó Wi-Fi Certified 7 (2,4, 5 y 6 GHz). El 16 de febrero de 2024 el IEEE aprobó la norma 802.3df, que define Ethernet de 400 y 800 Gb/s.","speed"],
+  ["2025","Se publica IEEE 802.11be","La norma de Wi-Fi 7 queda publicada.","mesh","La versión final de IEEE 802.11be-2024 se publicó el 22 de julio de 2025. Su velocidad teórica máxima en una banda es de 23 Gb/s; en la práctica es mucho menor.","wifi"],
+  ["2026","Ethernet de 1,6 Tb/s","IEEE 802.3dj, en desarrollo.","tree","Según Network World (7 de enero de 2026), IEEE 802.3dj, que cubre 200, 400, 800 Gb/s y 1,6 Tb/s con 200 Gb/s por carril, va camino de completarse a finales de 2026. La demanda de la inteligencia artificial impulsa estas velocidades.","chip"]
+ ],
+ tlSrc:"Fuente",
+ /* glosario */
+ glTitle:"Glosario",glSub:"Cuarenta términos del tema. Pulsa cada uno para ampliar la definición.",glSearch:"Buscar un término",glNone:"Sin resultados.",glAll:"Todos",
+ glCats:["Cables y conectores","Equipos","Protocolos y acceso","Normas","Conceptos de red"],
+ gl:[
+  ["CSMA/CD","Método de acceso del Ethernet clásico: escucha antes de transmitir y reintenta tras una colisión.",2,"Significa acceso múltiple por detección de portadora con detección de colisiones. El equipo verifica que el cable esté libre, transmite y, si detecta una colisión, espera un tiempo aleatorio antes de reintentar. Con switches y enlaces dedicados ya casi no hace falta."],
+  ["Testigo (token)","Señal especial que circula por el anillo. Solo quien la tiene puede transmitir.",2,"Es una pequeña trama especial que pasa de equipo en equipo. Quien necesita transmitir la captura, envía su trama y al terminar libera el testigo. Evita colisiones y da un acceso equitativo."],
+  ["Backbone (troncal)","Enlace principal de alta capacidad que une segmentos o switches.",4,"Es la columna vertebral de la red. Une pisos, edificios o switches de núcleo, y por eso suele ir en fibra óptica y con redundancia."],
+  ["Terminador","Resistencia de 50 Ω en cada extremo de un bus coaxial. Evita que la señal rebote.",0,"Sin terminador, la señal llega al final del cable y se refleja, interfiere con las nuevas transmisiones y la red deja de funcionar. Por eso un corte en un bus lo deja inutilizable."],
+  ["NIC","Tarjeta de interfaz de red. Conecta un equipo al medio físico.",1,"Convierte los datos del equipo en señales para el cable o el aire, y tiene una dirección MAC única. Puede ser una tarjeta, un chip en la placa o un adaptador USB."],
+  ["MAU","Unidad de acceso multiestación de Token Ring. Se cablea en estrella pero hace circular el anillo.",1,"Dentro de la MAU el anillo es lógico: la señal pasa por cada puerto en orden. Si un equipo se desconecta, la MAU lo puentea y el anillo sigue cerrado."],
+  ["Switch","Equipo que reenvía cada trama solo al puerto donde está el destino.",1,"Aprende las direcciones MAC de los equipos conectados a cada puerto y las guarda en una tabla. Así evita enviar tráfico a quien no lo necesita y elimina las colisiones en enlaces dedicados."],
+  ["Hub","Repetidor que envía la señal a todos los puertos. Hoy casi no se usa.",1,"No distingue destinatarios: repite todo lo que recibe por todos los puertos. Por eso una red con hub es una estrella física pero un bus lógico."],
+  ["Redundancia","Caminos o equipos de reserva que mantienen viva la red ante una falla.",4,"Es agregar enlaces o equipos duplicados para que la falla de uno no deje sin servicio a los usuarios. Mejora la disponibilidad, pero aumenta el costo."],
+  ["Trama","Unidad de datos que viaja por la red en la capa de enlace.",4,"Contiene las direcciones de origen y destino, los datos y un código de verificación de errores. En Ethernet, un switch decide por dónde reenviar cada trama."],
+  ["UTP","Par trenzado sin blindaje: el cable más usado en redes locales.",0,"Cuatro pares de hilos de cobre trenzados entre sí; el trenzado reduce la interferencia. Es económico y fácil de instalar. Se clasifica en categorías como Cat 5e, 6 y 6A."],
+  ["STP / FTP","Par trenzado con blindaje para zonas con mucha interferencia.",0,"Lleva una malla o una lámina metálica que protege los pares. Se usa en ambientes industriales o con mucho ruido eléctrico, y exige una buena conexión a tierra."],
+  ["Fibra monomodo","Fibra de núcleo muy delgado para largas distancias.",0,"Transporta un solo haz de luz y alcanza muchos kilómetros con poca pérdida. Se usa en enlaces entre edificios, ciudades y operadores."],
+  ["Fibra multimodo","Fibra de núcleo más grueso para distancias cortas y medias.",0,"Permite varios haces de luz a la vez. Es más económica de conectar y se usa dentro de edificios y centros de datos, en troncales de cientos de metros."],
+  ["Cable coaxial","Cable con núcleo de cobre, aislante y malla. Base del Ethernet original.",0,"Fue el medio de los primeros Ethernet de bus (10BASE5 y 10BASE2). Hoy sobrevive en televisión por cable y algunas aplicaciones de radiofrecuencia."],
+  ["RJ-45","Conector de ocho pines para cable de par trenzado.",0,"Es el conector que ves en los cables de red. Sus ocho pines se conectan siguiendo el esquema T568A o T568B."],
+  ["Patch cord","Cable corto con conectores que une la toma o el patch panel con el equipo.",0,"Es el cable flexible que va del computador a la toma de pared y del patch panel al switch. Cuenta dentro de los 100 m del canal."],
+  ["Patch panel","Panel de conexión que organiza los cables que llegan al rack.",1,"Cada puerto del panel es el extremo de un cable horizontal. Con patch cords cortos se conecta cada puerto al switch, lo que permite cambiar conexiones sin tocar el cable fijo."],
+  ["Rack","Armario estandarizado donde se montan switches, paneles y servidores.",1,"Se mide en unidades de rack (U). Un buen rack tiene organizadores de cable, ventilación y alimentación protegida con UPS."],
+  ["Router","Equipo que une redes distintas y elige la mejor ruta.",1,"Trabaja con direcciones IP, no solo con MAC. Es el nodo típico de una malla y la puerta de salida de una red hacia Internet."],
+  ["Punto de acceso (AP)","Equipo que conecta dispositivos inalámbricos a la red cableada.",1,"Da cobertura Wi-Fi y se conecta por cable a un switch. En una red mesh inalámbrica varios AP también se enlazan entre sí por radio."],
+  ["Nodo","Cualquier equipo conectado a la red: computador, switch, router…",4,"En la teoría de grafos, con la que se modelan las topologías, los nodos son los puntos y los enlaces son las líneas que los unen."],
+  ["Enlace","Conexión entre dos nodos, por cable o por radio.",4,"Cada cable de una red es un enlace. Contar los enlaces permite comparar costos: una malla completa de n nodos tiene n(n−1)/2."],
+  ["Topología física","La forma en que se disponen los cables y los equipos.",4,"Describe el plano real de la red: dónde van los cables y cómo se conectan los equipos. Define cuánto cable se compra y qué se rompe cuando algo falla."],
+  ["Topología lógica","El camino que siguen los datos, sin importar el cableado.",4,"Describe cómo circula la información. Puede diferir de la física, como en Token Ring: estrella física, anillo lógico."],
+  ["Ancho de banda","Cantidad máxima de datos que un enlace puede transportar por segundo.",4,"Se mide en bits por segundo (Mb/s, Gb/s). Es la capacidad del enlace, que no siempre coincide con la velocidad real que ve el usuario."],
+  ["Latencia","Tiempo que tarda un dato en llegar de un equipo a otro.",4,"Se mide en milisegundos. Cada salto por un switch o un router agrega un poco, por eso una topología con menos saltos suele responder más rápido."],
+  ["Colisión","Choque de dos transmisiones simultáneas en un medio compartido.",2,"Ocurre en un bus o con un hub cuando dos equipos transmiten a la vez. Las tramas se dañan y deben reenviarse."],
+  ["Dominio de colisión","Conjunto de equipos cuyas transmisiones pueden chocar entre sí.",4,"En un bus o con un hub, toda la red es un único dominio. Con un switch, cada puerto es su propio dominio de colisión."],
+  ["Dirección MAC","Identificador único de 48 bits de cada tarjeta de red.",2,"Se escribe en hexadecimal, por ejemplo 00:1A:2B:3C:4D:5E. El switch la usa para saber en qué puerto está cada equipo."],
+  ["VLAN","Red local virtual: divide un switch en varias redes separadas.",2,"Permite separar departamentos, como contabilidad y sistemas, aunque compartan los mismos switches y cables. Mejora la seguridad y reduce el tráfico innecesario."],
+  ["Spanning Tree (STP)","Protocolo que evita bucles en redes con enlaces redundantes.",2,"Si una red de switches tiene caminos duplicados, las tramas pueden dar vueltas sin fin. STP bloquea algunos enlaces y los reactiva si falla el principal."],
+  ["Ethernet","La familia de tecnologías de red local más usada del mundo.",3,"Nació como un bus con cable coaxial y hoy se usa en estrella con par trenzado y fibra. Sus velocidades van de 10 Mb/s a cientos de Gb/s."],
+  ["IEEE 802.3","Estándar que define Ethernet.",3,"Es la norma del IEEE que describe la capa física y el acceso al medio de Ethernet. Se actualiza con enmiendas como 802.3ab (Gigabit sobre cobre) y 802.3df (400 y 800 Gb/s)."],
+  ["IEEE 802.11 (Wi-Fi)","Familia de estándares de redes inalámbricas locales.",3,"Wi-Fi 6 corresponde a 802.11ax y Wi-Fi 7 a 802.11be. La variante 802.11s define las redes en malla."],
+  ["ANSI/TIA-568","Norma de cableado de telecomunicaciones para edificios comerciales.",3,"Se publicó por primera vez en 1991 como EIA/TIA-568. Define categorías de cable, distancias, conectores y la topología en estrella del cableado horizontal."],
+  ["T568A / T568B","Los dos esquemas de color para conectar un RJ-45.",3,"Se diferencian en el intercambio de los pares verde y naranja. Usar el mismo en ambos extremos da un cable directo; uno distinto en cada extremo, un cable cruzado."],
+  ["Cableado horizontal","Cable que va de la toma de cada usuario al cuarto de telecomunicaciones.",4,"Máximo 90 m de enlace permanente. Es el subsistema con más cable de todo el edificio."],
+  ["Cuarto de telecomunicaciones","Espacio que aloja el rack, el patch panel y los switches de un piso.",4,"Es el punto de encuentro entre el cableado horizontal del piso y el troncal que sube al resto del edificio."],
+  ["PoE","Power over Ethernet: alimenta equipos por el mismo cable de datos.",2,"Permite energizar teléfonos IP, cámaras y puntos de acceso con el mismo cable de red, sin un adaptador de corriente aparte. Lo regulan normas como IEEE 802.3af, at y bt."]
+ ],
+ refGroups:["Topologías de red y cableado (en español)","Normas, estándares e historia"],
+ refsExtra:[
+  ["IEEE Std 802.3ab-1999 (1000BASE-T)","IEEE Standards Association. Publicada el 26 de julio de 1999. En inglés.","https://standards.ieee.org/ieee/802.3ab/1086/"],
+  ["IEEE P802.3df: 400 Gb/s and 800 Gb/s Ethernet","IEEE 802.3. Aprobada el 16 de febrero de 2024. En inglés.","https://ieee802.org/3/df/"],
+  ["IEEE ratifies 10GBASE-T standard","Lightwave. Ratificación del 8 de junio de 2006. En inglés.","https://www.lightwaveonline.com/optical-tech/article/16669945/ieee-ratifies-10gbaset-standard"],
+  ["ANSI/TIA-568","Wikipedia. Historia de la norma, esquemas T568A y T568B. En inglés.","https://en.wikipedia.org/wiki/ANSI/TIA-568"],
+  ["IEEE 802.11be-2024","Wikipedia. Publicación el 22 de julio de 2025. En inglés.","https://en.wikipedia.org/wiki/IEEE_802.11be-2024"],
+  ["Wi-Fi 7 (802.11be)","Digi International. Lanzamiento de Wi-Fi Certified 7, 8 de enero de 2024. En inglés.","https://www.digi.com/resources/definitions/wi-fi-7"],
+  ["New Wi-Fi 6 certification is officially released","Tom's Hardware. Lanzamiento de la certificación, septiembre de 2019. En inglés.","https://www.tomshardware.com/news/wi-fi-6-certification-apple-samsung,40410.html"],
+  ["Ethernet groups keep 2026 focus on higher bandwidth, AI demands","Network World, 7 de enero de 2026. IEEE 802.3dj. En inglés.","https://www.networkworld.com/article/4113364/ethernet-groups-keep-2026-focus-on-higher-bandwidth-ai-demands.html"],
+  ["Cat 5e, 6, 6A and 8 performance","Open Exam Prep. Frecuencias, velocidades y longitudes por categoría. En inglés.","https://open-exam-prep.com/study-guides/bicsi-technician/chapter-2/cat5e-6-6a-performance"]
+ ]
+});
+Object.assign(I.en,{
+ nCable:"Cabling",nFaq:"FAQ",nDesign:"Design your network",
+ kBtn:"Search",kPh:"Search sections, terms, questions…",kHint:"↑ ↓ to move · Enter to go · Esc to close",kNone:"No results.",aK:"Search the page (Ctrl + K)",
+ kTypes:{sec:"Section",gl:"Glossary",faq:"Question",hist:"History",ref:"Source"},
+ stats:[["topologies"],["historic milestones"],["terms"],["sources"]],
+ accOpen:"Expand all",accClose:"Collapse all",
+ accPros:"Pros and cons",accUses:"Where it is used",accSheet:"Data sheet",
+ cableTitle:"Structured cabling: where topologies become real",
+ cableP1:"Structured cabling is a system of cables, connectors and spaces organized by standards that serves data, voice and video in a building regardless of the equipment plugged into it. The reference standard is ANSI/TIA-568, first published in 1991 as EIA/TIA-568; its current revision is ANSI/TIA-568-E, from 2020.",
+ cableP2:"For this project the key point is this: in horizontal cabling the standard uses a star topology, and the backbone joins the telecommunications rooms hierarchically. A whole building ends up as a tree topology, that is, a star of stars.",
+ subsTitle:"The six elements of the system",
+ subs:[["Work area","Where the users are: computers, IP phones and printers, connected to the wall outlet with a patch cord."],["Horizontal cabling","Joins each work-area outlet to the telecommunications room on its floor, in a star topology. The permanent link is limited to 90 m, and with patch cords the full channel reaches 100 m."],["Backbone cabling","Connects the telecommunications rooms, the equipment room and the entrance facility between floors and buildings. It is the backbone of the system and is often optical fiber."],["Telecommunications room","Houses each floor's rack, patch panel and switches. Horizontal cabling ends here and the backbone begins."],["Equipment room","Concentrates the building's main equipment: servers, core switches and the phone exchange."],["Entrance facility","The point where the provider's (ISP) services enter the building and connect to the internal network."]],
+ svgB:{ts:"Entrance (ISP)",er:"Equipment room",tr:"Telecom room",wa:"Work area",hz:"Horizontal",bb:"Backbone",f:"Floor"},
+ catTitle:"Twisted-pair cable categories",
+ catHead:["Category","Frequency","Maximum speed","Maximum channel length"],
+ catRows:[["Cat 5e","100 MHz","1 Gb/s","100 m"],["Cat 6","250 MHz","1 Gb/s (10 Gb/s only up to about 55 m)","100 m"],["Cat 6A","500 MHz","10 Gb/s","100 m"],["Cat 8","2000 MHz","25 / 40 Gb/s","30 m (with two connectors)"]],
+ catNote:"Reference values: they may vary by manufacturer and installation conditions. Optical fiber (single-mode and multimode) is used when distance or speed exceed what copper allows.",
+ t568Title:"T568A and T568B color code",
+ t568Intro:"The two RJ-45 wiring schemes defined by the standard. Using the same one at both ends gives a straight-through cable; using a different one at each end gives a crossover cable.",
+ t568Pin:"Pin",t568Pair:"Pair",t568Straight:"Same scheme at both ends: straight-through cable.",t568Cross:"T568A at one end and T568B at the other: crossover cable.",
+ t568Names:["white/green","green","white/orange","blue","white/blue","orange","white/brown","brown"],
+ galTitle:"Technical gallery",galRack:"Rack in a telecommunications room",galUtp:"Cross-section of a UTP cable",galDc:"Data center with spine-leaf topology",
+ svgR:{pp:"Patch panel",sw:"Switch",org:"Cable manager",ups:"UPS",srv:"Server"},
+ svgU:{jk:"Jacket",sp:"Separator",cu:"Copper conductor",pr:"Twisted pair"},
+ svgD:{spine:"Spine (core)",leaf:"Leaf (access)"},
+ dsTitle:"Design your network",dsSub:"Describe the building and I propose a topology with estimated quantities.",
+ dsFloors:"Floors",dsPer:"Devices per floor",dsPrio:"Priority",dsPrios:[["Cost","cost"],["Balance","bal"],["Availability","ha"]],
+ dsRes:"Proposal",dsTopo:"Topology",dsSw:"Access switches",dsCore:"Core switches",dsHz:"Horizontal cable",dsBb:"Backbone links",dsRack:"Racks",dsCost:"Estimated cost",
+ dsWhy:{cost:"One star per floor with a single core: the cheapest and easiest to manage.",bal:"A tree of stars with one core and one link per switch: the middle ground between cost and order.",ha:"A tree with a dual core and two links per switch: a partial mesh in the core that avoids a single point of failure."},
+ dsTopoNames:{cost:"Star",bal:"Tree",ha:"Hybrid tree with partial mesh core"},
+ dsNote:"Teaching estimate: 24 ports per switch with 20% spare, 30 m average per horizontal cable and 20 m per backbone link. Unit prices are reference values (Colombian pesos); the price per meter of cable comes from the cost estimator.",
+ gmTitle:"Build the topology",gmSub:"Connect the devices by tapping one and then another, or by dragging. Tap a cable to remove it.",
+ gmGoals:[["Star","star"],["Ring","ring"],["Full mesh","mesh"]],
+ gmCheck:"Check",gmClear:"Clear",gmLinks:"cables",
+ gmMsg:{ok:"Correct! The topology is built right.",none:"You have not connected anything yet.",star:function(a,b){return "Star: every device goes only to the central switch. "+a+" missing and "+b+" extra."},ring:function(a,b){return "Ring: each device joins its two neighbors to form a circle. "+a+" missing and "+b+" extra."},mesh:function(a,b){return "Full mesh: everyone with everyone (15 cables). "+a+" missing and "+b+" extra."}},
+ gmGoalTxt:{star:"Goal: connect the 6 devices to the central switch.",ring:"Goal: form a closed circle, each device with its two neighbors.",mesh:"Goal: connect every device to all the others."},
+ faqTitle:"Frequently asked questions",faqIntro:"Short answers to the most common doubts on the topic.",
+ faq:[["What is the difference between physical and logical topology?","The physical one is how cables and devices are laid out; the logical one is the path the data follows. A network with a hub, for example, is wired as a star but data flows as on a bus."],["Why is the bus almost never used now?","Because a single cut takes the whole network down, the fault is hard to find and performance drops with more devices. The star with a switch solved all three problems."],["Which topology suits a home or a small business?","The star: a central switch or router, and one cable (or Wi-Fi signal) per device. It is cheap, easy to expand and easy to troubleshoot."],["Is a mesh always better because it is more redundant?","No. A full mesh of n devices needs n(n−1)/2 links, so the cost grows very fast. That is why it is used in the network core and not everywhere."],["What is the maximum distance of a UTP cable?","In structured cabling, the horizontal permanent link reaches 90 m and the whole channel, with patch cords, 100 m."],["What is the difference between T568A and T568B?","Only the green and orange pairs swap places on pins 1, 2, 3 and 6. What matters is using the same scheme throughout the project."],["What is a hybrid topology?","A combination of two or more topologies, such as a tree of stars with a partial mesh in the core. Almost all real networks are hybrid."],["How does structured cabling relate to topologies?","Horizontal cabling is a star and the backbone joins the rooms hierarchically; a whole building forms a tree."]],
+ histTitle:"History up to 2026",histIntro:"From a memo in 1973 to 1.6 Tb/s Ethernet under development. Tap each milestone for details.",
+ timeline:[
+  ["1973","Ethernet is born","Metcalfe writes the Ethernet memo, with one shared cable: a bus.","bus","Robert Metcalfe's memo, dated May 22, 1973, described a local network with a single cable shared by every device. Ethernet grew out of that idea.","bus"],
+  ["1983","Ethernet is standardized","The IEEE 802 committee approves Ethernet as IEEE 802.3.","doc","With the standard approved, different manufacturers could build compatible equipment, which drove the spread of local networks.","doc"],
+  ["1980s","Token Ring","IBM pushes the token-passing ring, IEEE 802.5.","ring","The token circulates around the ring and only its holder may transmit, so there are no collisions. It ran at 4 and 16 Mb/s and was physically wired as a star with MAU units.","ring"],
+  ["1987","FDDI","ANSI dual fiber ring standard at 100 Mb/s.","ring","FDDI uses two optical fiber rings turning in opposite directions. If a link is cut, the network reconfigures and keeps running.","fiber"],
+  ["1990","10BASE-T","Ethernet moves to twisted pair with a central device.","star","Each device connects with its own cable to a hub or switch. A damaged cable no longer takes the whole network down, and the star took over local networks.","star"],
+  ["1991","First structured cabling standard","EIA/TIA-568 is published for commercial buildings.","doc","This was the first version of what is now ANSI/TIA-568. It defined how to cable a building independently of the equipment plugged in.","doc"],
+  ["1995","Fast Ethernet","Ethernet reaches 100 Mb/s on the same star.","tree","Star cabling with twisted pair stayed the same while speed grew tenfold.","star"],
+  ["1999","Gigabit over copper","IEEE 802.3ab takes Ethernet to 1 Gb/s over twisted pair.","speed","IEEE 802.3ab was published on July 26, 1999. It defines 1000BASE-T: 1000 Mb/s over four pairs of Category 5 cable.","speed"],
+  ["2006","10 Gigabit over copper","10GBASE-T is ratified.","speed","On June 8, 2006 the standard that carries 10 Gb/s over four-pair twisted-pair cable was approved. The maximum distance depends on cable quality.","speed"],
+  ["2011","Wireless meshes","IEEE 802.11s brings the mesh to Wi-Fi.","mesh","Access points connect to each other and find the best route on their own, as seen today in home Wi-Fi mesh systems.","wifi"],
+  ["2019","Wi-Fi 6","The Wi-Fi Alliance launches Wi-Fi 6 (802.11ax) certification.","tree","The certification launched in September 2019. It introduced OFDMA and 1024-QAM to serve more devices at once.","wifi"],
+  ["2024","Wi-Fi 7 and 800 Gb/s Ethernet","Wi-Fi 7 certification and approval of IEEE 802.3df.","speed","On January 8, 2024 the Wi-Fi Alliance launched Wi-Fi Certified 7 (2.4, 5 and 6 GHz). On February 16, 2024 the IEEE approved 802.3df, which defines 400 and 800 Gb/s Ethernet.","speed"],
+  ["2025","IEEE 802.11be is published","The Wi-Fi 7 standard is published.","mesh","The final version of IEEE 802.11be-2024 was published on July 22, 2025. Its maximum theoretical rate in one band is 23 Gb/s; real results are much lower.","wifi"],
+  ["2026","1.6 Tb/s Ethernet","IEEE 802.3dj, under development.","tree","According to Network World (January 7, 2026), IEEE 802.3dj, covering 200, 400, 800 Gb/s and 1.6 Tb/s at 200 Gb/s per lane, is on track for completion in late 2026. Demand from artificial intelligence drives these speeds.","chip"]
+ ],
+ tlSrc:"Source",
+ glTitle:"Glossary",glSub:"Forty terms on the topic. Tap each one to expand its definition.",glSearch:"Search a term",glNone:"No results.",glAll:"All",
+ glCats:["Cables and connectors","Equipment","Protocols and access","Standards","Network concepts"],
+ gl:[
+  ["CSMA/CD","Access method of classic Ethernet: listen before transmitting and retry after a collision.",2,"Carrier-sense multiple access with collision detection. The device checks that the cable is free, transmits and, if it detects a collision, waits a random time before retrying. With switches and dedicated links it is hardly needed anymore."],
+  ["Token","Special signal that circulates around the ring. Only its holder may transmit.",2,"A small special frame that passes from device to device. Whoever needs to transmit captures it, sends its frame and releases the token when done. It avoids collisions and gives fair access."],
+  ["Backbone","High-capacity main link joining segments or switches.",4,"The spine of the network. It joins floors, buildings or core switches, so it is usually optical fiber with redundancy."],
+  ["Terminator","50 Ω resistor at each end of a coaxial bus. It stops the signal from bouncing back.",0,"Without a terminator the signal reaches the end of the cable and reflects, interfering with new transmissions and the network stops working. That is why a cut on a bus makes it unusable."],
+  ["NIC","Network interface card. Connects a device to the physical medium.",1,"It turns the device's data into signals for the cable or the air, and has a unique MAC address. It can be a card, a chip on the motherboard or a USB adapter."],
+  ["MAU","Token Ring multistation access unit. Wired as a star but circulates the ring.",1,"Inside the MAU the ring is logical: the signal goes through each port in order. If a device is disconnected, the MAU bypasses it and the ring stays closed."],
+  ["Switch","Device that forwards each frame only to the port where the destination is.",1,"It learns the MAC addresses of the devices on each port and stores them in a table. That avoids sending traffic to those who do not need it and removes collisions on dedicated links."],
+  ["Hub","Repeater that sends the signal out of every port. Rarely used today.",1,"It does not tell recipients apart: it repeats everything it receives out of every port. That is why a hub network is a physical star but a logical bus."],
+  ["Redundancy","Spare paths or devices that keep the network alive when something fails.",4,"Adding duplicate links or devices so that one failure does not leave users without service. It improves availability but raises cost."],
+  ["Frame","Unit of data that travels the network at the link layer.",4,"It contains the source and destination addresses, the data and an error-check code. In Ethernet, a switch decides where to forward each frame."],
+  ["UTP","Unshielded twisted pair: the most used cable in local networks.",0,"Four pairs of copper wires twisted together; the twist reduces interference. It is cheap and easy to install. It is graded in categories such as Cat 5e, 6 and 6A."],
+  ["STP / FTP","Shielded twisted pair for areas with a lot of interference.",0,"It has a metal braid or foil that protects the pairs. Used in industrial or electrically noisy environments, and it needs good grounding."],
+  ["Single-mode fiber","Very thin-core fiber for long distances.",0,"Carries a single beam of light and reaches many kilometers with little loss. Used in links between buildings, cities and carriers."],
+  ["Multimode fiber","Thicker-core fiber for short and medium distances.",0,"Allows several beams of light at once. It is cheaper to terminate and is used inside buildings and data centers, on backbones of hundreds of meters."],
+  ["Coaxial cable","Cable with a copper core, insulation and shield. Basis of original Ethernet.",0,"It was the medium of the first bus Ethernets (10BASE5 and 10BASE2). Today it survives in cable TV and some radio-frequency applications."],
+  ["RJ-45","Eight-pin connector for twisted-pair cable.",0,"The connector you see on network cables. Its eight pins are wired following the T568A or T568B scheme."],
+  ["Patch cord","Short cable with connectors joining the outlet or patch panel to the device.",0,"The flexible cable that goes from the computer to the wall outlet and from the patch panel to the switch. It counts toward the 100 m of the channel."],
+  ["Patch panel","Connection panel that organizes the cables arriving at the rack.",1,"Each panel port is the end of a horizontal cable. Short patch cords link each port to the switch, so connections can be changed without touching the fixed cable."],
+  ["Rack","Standardized cabinet where switches, panels and servers are mounted.",1,"Measured in rack units (U). A good rack has cable managers, ventilation and UPS-protected power."],
+  ["Router","Device that joins different networks and picks the best route.",1,"It works with IP addresses, not just MAC. It is the typical node of a mesh and the network's gateway to the Internet."],
+  ["Access point (AP)","Device that connects wireless devices to the wired network.",1,"It provides Wi-Fi coverage and connects by cable to a switch. In a wireless mesh several APs also link to each other by radio."],
+  ["Node","Any device connected to the network: computer, switch, router…",4,"In graph theory, used to model topologies, nodes are the points and links are the lines joining them."],
+  ["Link","Connection between two nodes, by cable or by radio.",4,"Every cable in a network is a link. Counting links lets you compare costs: a full mesh of n nodes has n(n−1)/2."],
+  ["Physical topology","How cables and devices are laid out.",4,"It describes the real plan of the network: where cables go and how devices connect. It defines how much cable is bought and what breaks when something fails."],
+  ["Logical topology","The path data follows, regardless of cabling.",4,"It describes how information flows. It can differ from the physical one, as in Token Ring: physical star, logical ring."],
+  ["Bandwidth","Maximum amount of data a link can carry per second.",4,"Measured in bits per second (Mb/s, Gb/s). It is the link's capacity, which does not always match the real speed the user sees."],
+  ["Latency","Time a piece of data takes to get from one device to another.",4,"Measured in milliseconds. Each hop through a switch or router adds a little, so a topology with fewer hops usually responds faster."],
+  ["Collision","Clash of two simultaneous transmissions on a shared medium.",2,"Happens on a bus or with a hub when two devices transmit at once. The frames are corrupted and must be resent."],
+  ["Collision domain","Set of devices whose transmissions can clash with each other.",4,"On a bus or with a hub the whole network is a single domain. With a switch, each port is its own collision domain."],
+  ["MAC address","Unique 48-bit identifier of each network card.",2,"Written in hexadecimal, for example 00:1A:2B:3C:4D:5E. The switch uses it to know which port each device is on."],
+  ["VLAN","Virtual local network: splits one switch into several separate networks.",2,"Lets you separate departments, such as accounting and IT, even if they share the same switches and cables. It improves security and reduces unnecessary traffic."],
+  ["Spanning Tree (STP)","Protocol that prevents loops in networks with redundant links.",2,"If a network of switches has duplicate paths, frames can circle forever. STP blocks some links and reactivates them if the main one fails."],
+  ["Ethernet","The most widely used family of local network technologies.",3,"It was born as a bus over coaxial cable and today is used as a star over twisted pair and fiber. Its speeds range from 10 Mb/s to hundreds of Gb/s."],
+  ["IEEE 802.3","The standard that defines Ethernet.",3,"The IEEE standard describing Ethernet's physical layer and medium access. It is updated through amendments such as 802.3ab (Gigabit over copper) and 802.3df (400 and 800 Gb/s)."],
+  ["IEEE 802.11 (Wi-Fi)","Family of wireless local network standards.",3,"Wi-Fi 6 corresponds to 802.11ax and Wi-Fi 7 to 802.11be. The 802.11s variant defines mesh networks."],
+  ["ANSI/TIA-568","Telecommunications cabling standard for commercial buildings.",3,"First published in 1991 as EIA/TIA-568. It defines cable categories, distances, connectors and the star topology of horizontal cabling."],
+  ["T568A / T568B","The two color schemes for wiring an RJ-45.",3,"They differ in swapping the green and orange pairs. Using the same at both ends gives a straight-through cable; a different one at each end, a crossover cable."],
+  ["Horizontal cabling","Cable from each user's outlet to the telecommunications room.",4,"Maximum 90 m permanent link. It is the subsystem with the most cable in the whole building."],
+  ["Telecommunications room","Space housing a floor's rack, patch panel and switches.",4,"The meeting point between the floor's horizontal cabling and the backbone that rises to the rest of the building."],
+  ["PoE","Power over Ethernet: powers devices through the same data cable.",2,"Lets IP phones, cameras and access points be powered over the same network cable, without a separate power adapter. Governed by standards such as IEEE 802.3af, at and bt."]
+ ],
+ refGroups:["Network topologies and cabling","Standards and history"],
+ refsExtra:[
+  ["IEEE Std 802.3ab-1999 (1000BASE-T)","IEEE Standards Association. Published July 26, 1999.","https://standards.ieee.org/ieee/802.3ab/1086/"],
+  ["IEEE P802.3df: 400 Gb/s and 800 Gb/s Ethernet","IEEE 802.3. Approved February 16, 2024.","https://ieee802.org/3/df/"],
+  ["IEEE ratifies 10GBASE-T standard","Lightwave. Ratification of June 8, 2006.","https://www.lightwaveonline.com/optical-tech/article/16669945/ieee-ratifies-10gbaset-standard"],
+  ["ANSI/TIA-568","Wikipedia. History of the standard, T568A and T568B schemes.","https://en.wikipedia.org/wiki/ANSI/TIA-568"],
+  ["IEEE 802.11be-2024","Wikipedia. Published July 22, 2025.","https://en.wikipedia.org/wiki/IEEE_802.11be-2024"],
+  ["Wi-Fi 7 (802.11be)","Digi International. Wi-Fi Certified 7 launch, January 8, 2024.","https://www.digi.com/resources/definitions/wi-fi-7"],
+  ["New Wi-Fi 6 certification is officially released","Tom's Hardware. Certification launch, September 2019.","https://www.tomshardware.com/news/wi-fi-6-certification-apple-samsung,40410.html"],
+  ["Ethernet groups keep 2026 focus on higher bandwidth, AI demands","Network World, January 7, 2026. IEEE 802.3dj.","https://www.networkworld.com/article/4113364/ethernet-groups-keep-2026-focus-on-higher-bandwidth-ai-demands.html"],
+  ["Cat 5e, 6, 6A and 8 performance","Open Exam Prep. Frequencies, speeds and lengths per category.","https://open-exam-prep.com/study-guides/bicsi-technician/chapter-2/cat5e-6-6a-performance"]
+ ]
+});
+/* Spanish-only structured-cabling reference + English mirror of the Spanish ones are added in the renderer */
+I.es.refsCable=[["Curso de cableado estructurado","Material de curso en español. Normas ANSI/TIA/EIA-568, subsistemas y categorías de cable.","https://www.uazuay.edu.ec/sites/default/files/public/2022-01/cableado_estructurado.pdf"]];
+I.en.refsCable=I.es.refsCable;
+
+/* ===================== v6 ===================== */
+function ACC(title,body,open,cls){return '<details class="acc'+(cls?' '+cls:'')+'"'+(open?' open':'')+'><summary><span>'+title+'</span><i class="pm-i" aria-hidden="true"></i></summary><div class="acc-b">'+body+'</div></details>'}
+function escA(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;")}
+function norm(s){var r=String(s).toLowerCase();try{r=r.normalize("NFD").replace(/[̀-ͯ]/g,"")}catch(e){}return r}
+var ICONS={bus:'<path d="M3 12h18M6 12v-4M12 12v-4M18 12v-4M6 12v4M12 12v4M18 12v4"/>',doc:'<path d="M7 3h7l4 4v14H7z"/><path d="M14 3v4h4M10 12h5M10 16h5"/>',ring:'<circle cx="12" cy="12" r="7"/><circle cx="12" cy="5" r="1.6"/><circle cx="19" cy="12" r="1.6"/><circle cx="12" cy="19" r="1.6"/><circle cx="5" cy="12" r="1.6"/>',fiber:'<path d="M3 17c6 0 6-10 12-10h6M3 12c6 0 6-5 12-5"/><circle cx="21" cy="7" r="1.5"/>',star:'<circle cx="12" cy="12" r="2.4"/><path d="M12 9.6V4M12 14.4V20M9.6 12H4M14.4 12H20M10 10 6 6M14 10l4-4M10 14l-4 4M14 14l4 4"/>',speed:'<path d="M4 17a8 8 0 1 1 16 0"/><path d="M12 17l4-6"/>',mesh:'<circle cx="6" cy="6" r="1.8"/><circle cx="18" cy="6" r="1.8"/><circle cx="6" cy="18" r="1.8"/><circle cx="18" cy="18" r="1.8"/><path d="M6 6h12v12H6zM6 6l12 12M18 6 6 18"/>',wifi:'<path d="M3 9a14 14 0 0 1 18 0M6 12.5a9 9 0 0 1 12 0M9 16a4.5 4.5 0 0 1 6 0"/><circle cx="12" cy="19" r="1.2"/>',chip:'<rect x="7" y="7" width="10" height="10" rx="1.5"/><path d="M10 3v4M14 3v4M10 17v4M14 17v4M3 10h4M3 14h4M17 10h4M17 14h4"/>'};
+
+/* ---- timeline ---- */
+function renderTimeline(){
+  var t=L(),n=t.timeline.length;
+  $("#tlList").innerHTML=t.timeline.map(function(e,i){
+    return '<details class="tl-item t-'+e[3]+'" id="h'+i+'"'+(i===n-1?' open':'')+'><summary><span class="yr">'+e[0]+'</span><span class="tl-ic"><svg viewBox="0 0 24 24" aria-hidden="true">'+(ICONS[e[5]]||ICONS.doc)+'</svg></span><span class="tl-t"><b>'+e[1]+'</b><em>'+e[2]+'</em></span><i class="pm-i" aria-hidden="true"></i></summary><div class="acc-b"><p>'+e[4]+'</p><a class="tl-src" href="#fuentes">'+t.tlSrc+' &#8594;</a></div></details>';
+  }).join("");
+}
+
+/* ---- glossary ---- */
+var GL={cat:-1,ltr:""};
+function glLetter(g){return norm(g[0]).replace(/[^a-z]/g,"").charAt(0).toUpperCase()||"#"}
+function renderGlossary(){
+  var t=L(),q=norm($("#glQ").value||"").trim();
+  var base=t.gl.filter(function(g){return GL.cat<0||g[2]===GL.cat});
+  var letters={};base.forEach(function(g){letters[glLetter(g)]=1});
+  if(GL.ltr&&!letters[GL.ltr])GL.ltr="";
+  var items=base.filter(function(g){
+    if(GL.ltr&&glLetter(g)!==GL.ltr)return false;
+    return !q||norm(g[0]).indexOf(q)>=0||norm(g[1]).indexOf(q)>=0||norm(g[3]).indexOf(q)>=0;
+  }).sort(function(a,b){return norm(a[0])<norm(b[0])?-1:1});
+  var chips='<button type="button" class="fchip" data-glc="-1" aria-pressed="'+(GL.cat<0)+'">'+t.glAll+'</button>'+t.glCats.map(function(c,i){return '<button type="button" class="fchip" data-glc="'+i+'" aria-pressed="'+(GL.cat===i)+'">'+c+'</button>'}).join("");
+  var az="ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").map(function(l){return '<button type="button" class="fchip" data-gll="'+l+'" aria-pressed="'+(GL.ltr===l)+'"'+(letters[l]?'':' disabled')+'>'+l+'</button>'}).join("");
+  $("#glTools").innerHTML='<div class="chiprow">'+chips+'</div><div class="chiprow azrow">'+az+'</div><div class="gl-count">'+items.length+' / '+t.gl.length+'</div>';
+  $("#glList").innerHTML=items.length?items.map(function(g){
+    return '<details class="gl-it" data-term="'+escA(g[0])+'"><summary><span class="gt"><b>'+g[0]+'</b><span>'+g[1]+'</span></span><i class="pm-i" aria-hidden="true"></i></summary><p class="gl-long">'+g[3]+'</p><span class="gl-cat">'+t.glCats[g[2]]+'</span></details>';
+  }).join(""):'<p>'+t.glNone+'</p>';
+}
+
+/* ---- faq ---- */
+function renderFaq(){
+  var t=L();
+  $("#faqList").innerHTML=t.faq.map(function(f,i){return ACC(f[0],'<p>'+f[1]+'</p>',false).replace('<details class="acc"','<details class="acc" id="q'+i+'"')}).join("");
+}
+
+/* ---- acc bars ---- */
+function renderAccBars(){
+  var t=L();
+  $$(".acc-bar").forEach(function(b){b.innerHTML='<button type="button" class="btn small" data-accact="open">+ '+t.accOpen+'</button><button type="button" class="btn small" data-accact="close">&times; '+t.accClose+'</button>'});
+}
+
+/* ---- refs ---- */
+function renderRefs(){
+  var t=L();
+  function li(r){return '<li><div class="rt"><b>'+r[0]+'</b><span>'+r[1]+'</span></div><a class="btn small" href="'+r[2]+'" target="_blank" rel="noopener noreferrer">'+t.open+' &#8599;</a></li>'}
+  $("#refWrap").innerHTML=ACC(t.refGroups[0]+' ('+t.refs.length+')','<ul class="refs">'+t.refs.map(li).join("")+'</ul>',true)+ACC(t.refGroups[1]+' ('+t.refsExtra.length+')','<ul class="refs">'+t.refsExtra.map(li).join("")+'</ul>',false);
+}
+
+/* ---- stats ---- */
+var STATS_DONE=false;
+function statVals(){var t=L();return [TYPES.length,t.timeline.length,t.gl.length,t.refs.length+t.refsExtra.length]}
+function renderStats(){
+  var t=L(),v=statVals();
+  $("#stats").innerHTML=v.map(function(n,i){return '<div class="stat"><b data-to="'+n+'">'+(STATS_DONE?n:0)+'</b><span>'+t.stats[i][0]+'</span></div>'}).join("");
+}
+function runStats(){
+  if(STATS_DONE)return;STATS_DONE=true;
+  var red=false;try{red=matchMedia("(prefers-reduced-motion: reduce)").matches}catch(e){}
+  var els=$$("#stats b"),t0=null;
+  if(red){els.forEach(function(e){e.textContent=e.getAttribute("data-to")});return}
+  function f(ts){if(t0===null)t0=ts;var p=Math.min(1,(ts-t0)/1300),k=1-Math.pow(1-p,3);els.forEach(function(e){e.textContent=Math.round(+e.getAttribute("data-to")*k)});if(p<1)requestAnimationFrame(f)}
+  requestAnimationFrame(f);
+}
+
+/* ---- SVG illustrations ---- */
+function svgBuilding(t){
+  var s=t.svgB,h='<svg viewBox="0 0 640 380" role="img" aria-label="'+escA(t.subsTitle)+'">';
+  h+='<rect class="sv-box" x="110" y="14" width="500" height="266" rx="10" style="fill:rgba(255,255,255,.02)"/>';
+  [0,1,2].forEach(function(i){
+    var y=18+i*84,m=y+40,fl=3-i;
+    h+='<rect class="sv-fl" x="114" y="'+y+'" width="492" height="80" rx="6"/>';
+    h+='<text class="sv-tx" x="8" y="'+(m+4)+'">'+s.f+' '+fl+'</text>';
+    h+='<rect class="sv-box" x="132" y="'+(m-20)+'" width="62" height="40" rx="6"/><text class="sv-tx b" x="163" y="'+(m-2)+'" text-anchor="middle">TR</text><text class="sv-tx" x="163" y="'+(m+12)+'" text-anchor="middle" style="font-size:10px">rack</text>';
+    [-26,0,26].forEach(function(dy){
+      h+='<path class="sv-hz" d="M194 '+m+'C300 '+m+' 340 '+(m+dy)+' 468 '+(m+dy)+'"/>';
+      h+='<rect class="sv-pc" x="468" y="'+(m+dy-9)+'" width="24" height="18" rx="3"/><rect class="sv-pc" x="474" y="'+(m+dy+10)+'" width="12" height="3" rx="1"/>';
+    });
+    h+='<text class="sv-tx" x="504" y="'+(m+4)+'" style="font-size:11px">'+s.wa+'</text>';
+  });
+  h+='<rect class="sv-box" x="132" y="284" width="130" height="50" rx="6"/><text class="sv-tx b" x="197" y="306" text-anchor="middle">ER</text><text class="sv-tx" x="197" y="322" text-anchor="middle" style="font-size:10px">'+s.er+'</text>';
+  h+='<path class="sv-bb" d="M122 309V58M122 58H132M122 142H132M122 226H132M122 309H132"/>';
+  h+='<path class="sv-isp" d="M70 310H132"/><path d="M26 318a14 14 0 0 1 4-26 18 18 0 0 1 34 4 12 12 0 0 1 4 22z" fill="rgba(179,139,255,.2)" stroke="#B38BFF" stroke-width="2"/>';
+  h+='<text class="sv-tx" x="48" y="350" text-anchor="middle">'+s.ts+'</text>';
+  h+='<text class="sv-tx" x="330" y="338" style="font-size:12px"><tspan fill="#5EE0FF">&#9473;</tspan> '+s.hz+' (90 m)   <tspan fill="#FFD84D">&#9473;</tspan> '+s.bb+'   TR = '+s.tr+'</text>';
+  return h+'</svg>';
+}
+function svgRack(t){
+  var s=t.svgR,h='<svg viewBox="0 0 320 400" role="img" aria-label="'+escA(t.galRack)+'">';
+  h+='<rect x="40" y="14" width="170" height="372" rx="8" class="sv-box"/><rect x="48" y="22" width="154" height="356" rx="4" fill="#0A1130" stroke="#27376B"/>';
+  function pp(y){var r='<rect x="54" y="'+y+'" width="142" height="26" rx="3" fill="#1E2D61" stroke="#5E73BA"/>';for(var i=0;i<12;i++)r+='<rect class="sv-port" x="'+(60+i*11.2)+'" y="'+(y+7)+'" width="8" height="10" rx="1.5"/>';return r+'<rect x="60" y="'+(y+19)+'" width="130" height="2" fill="#27376B"/>'}
+  function sw(y){var r='<rect x="54" y="'+y+'" width="142" height="26" rx="3" fill="#16224A" stroke="#5EE0FF"/>';for(var i=0;i<12;i++)r+='<rect x="'+(60+i*8)+'" y="'+(y+6)+'" width="6" height="8" rx="1" fill="#0A1130" stroke="#5E73BA"/><rect class="sv-led" x="'+(61.5+i*8)+'" y="'+(y+17)+'" width="3" height="3"/>';return r+'<rect x="162" y="'+(y+6)+'" width="28" height="14" rx="2" fill="#27376B"/>'}
+  function org(y){return '<rect x="54" y="'+y+'" width="142" height="22" rx="3" fill="#0F1836" stroke="#7E90CC"/><path d="M62 '+(y+11)+'q6-8 12 0t12 0t12 0t12 0t12 0t12 0t12 0" stroke="#FFD84D" stroke-width="2" fill="none"/>'}
+  h+=pp(32)+org(62)+sw(88)+org(118)+pp(144)+org(174)+sw(200)+org(230)+sw(256);
+  h+='<rect x="54" y="292" width="142" height="30" rx="3" fill="#16224A" stroke="#FF7AC8"/><rect x="62" y="300" width="60" height="6" rx="2" fill="#FF7AC8" opacity=".6"/><rect x="62" y="310" width="30" height="6" rx="2" fill="#27376B"/>';
+  h+='<rect x="54" y="328" width="142" height="40" rx="3" fill="#16224A" stroke="#59F0A0"/><circle cx="76" cy="348" r="8" fill="#59F0A0" opacity=".5"/><rect x="96" y="338" width="90" height="4" rx="2" fill="#27376B"/><rect x="96" y="348" width="90" height="4" rx="2" fill="#27376B"/><rect x="96" y="358" width="60" height="4" rx="2" fill="#27376B"/>';
+  var lab=[[45,s.pp],[101,s.sw],[157,s.pp],[213,s.sw],[307,s.srv],[348,s.ups],[75,s.org]];
+  lab.forEach(function(l){h+='<path class="sv-ld" d="M200 '+l[0]+'H232"/><text class="sv-tx" x="238" y="'+(l[0]+4)+'">'+l[1]+'</text>'});
+  return h+'</svg>';
+}
+function svgUtp(t){
+  var s=t.svgU,h='<svg viewBox="0 0 400 280" role="img" aria-label="'+escA(t.galUtp)+'">';
+  h+='<circle cx="110" cy="140" r="98" fill="#1E2D61" stroke="#5E73BA" stroke-width="3"/><circle cx="110" cy="140" r="88" fill="#0F1836"/>';
+  h+='<path d="M110 62v156M32 140h156" stroke="#7E90CC" stroke-width="6" stroke-linecap="round"/>';
+  var prs=[[72,102,"#2F6BFF"],[148,102,"#FF8A1F"],[72,178,"#2FBF4A"],[148,178,"#8B5A2B"]];
+  prs.forEach(function(p){
+    h+='<circle cx="'+(p[0]-9)+'" cy="'+p[1]+'" r="11" fill="'+p[2]+'" stroke="#fff" stroke-width="1"/><circle cx="'+(p[0]-9)+'" cy="'+p[1]+'" r="5.5" fill="#E8A55C"/>';
+    h+='<circle cx="'+(p[0]+9)+'" cy="'+(p[1]+3)+'" r="11" fill="#F1F4FF" stroke="'+p[2]+'" stroke-width="3"/><circle cx="'+(p[0]+9)+'" cy="'+(p[1]+3)+'" r="5.5" fill="#E8A55C"/>';
+  });
+  function L2(x1,y1,x2,y2,tx,ty,txt){h+='<path class="sv-ld" d="M'+x1+' '+y1+'L'+x2+' '+y2+'H'+(x2+8)+'"/><text class="sv-tx" x="'+tx+'" y="'+ty+'">'+txt+'</text>'}
+  L2(196,64,232,40,246,44,s.jk);L2(110,140,232,140,246,144,s.sp);L2(139,102,232,92,246,96,s.cu);L2(157,181,232,206,246,210,s.pr);
+  return h+'</svg>';
+}
+function svgDc(t){
+  var s=t.svgD,h='<svg viewBox="0 0 400 290" role="img" aria-label="'+escA(t.galDc)+'">';
+  var sp=[130,270],lf=[60,160,260,340];
+  sp.forEach(function(x){lf.forEach(function(y){h+='<path class="sv-hz" d="M'+x+' 66L'+y+' 154" style="opacity:.8"/>'})});
+  sp.forEach(function(x){h+='<rect class="sv-box" x="'+(x-46)+'" y="38" width="92" height="30" rx="6" style="stroke:#FFD84D"/><circle class="sv-led" cx="'+(x-30)+'" cy="53" r="3"/><text class="sv-tx b" x="'+(x+6)+'" y="57" text-anchor="middle" style="font-size:11px">SPINE</text>'});
+  lf.forEach(function(x,i){
+    h+='<rect class="sv-box" x="'+(x-38)+'" y="154" width="76" height="28" rx="6"/><text class="sv-tx b" x="'+x+'" y="172" text-anchor="middle" style="font-size:11px">LEAF</text>';
+    [-22,0,22].forEach(function(d){h+='<path class="sv-hz" d="M'+x+' 182L'+(x+d)+' 226" style="stroke:#7E90CC;stroke-width:1.2"/><rect class="sv-pc" x="'+(x+d-9)+'" y="226" width="18" height="30" rx="3"/><rect class="sv-led" x="'+(x+d-5)+'" y="232" width="4" height="3"/>'});
+  });
+  h+='<text class="sv-tx" x="6" y="16" style="font-size:11px;fill:#FFD84D">'+s.spine+'</text><text class="sv-tx" x="6" y="130" style="font-size:11px;fill:#5EE0FF">'+s.leaf+'</text>';
+  return h+'</svg>';
+}
+
+/* ---- T568 ---- */
+var T568={A:[0,1,2,3,4,5,6,7],B:[2,5,0,3,4,1,6,7]};
+var T568C=[["#2FBF4A",1],["#2FBF4A",0],["#FF8A1F",1],["#2F6BFF",0],["#2F6BFF",1],["#FF8A1F",0],["#8B5A2B",1],["#8B5A2B",0]];
+var T568S={e1:"A",e2:"A"};
+function pinBg(c){return c[1]?'repeating-linear-gradient(135deg,'+c[0]+' 0 7px,#fff 7px 14px)':c[0]}
+function renderT568(){
+  var t=L();
+  function end(k){
+    var sc=T568S[k],ord=T568[sc];
+    var tg='<div class="chiprow">'+["A","B"].map(function(x){return '<button type="button" class="fchip" data-t568="'+k+':'+x+'" aria-pressed="'+(sc===x)+'">T568'+x+'</button>'}).join("")+'</div>';
+    var pins='<div class="pins">'+ord.map(function(ci,i){return '<div class="pin"><i style="background:'+pinBg(T568C[ci])+'"></i><span>'+(i+1)+'</span><small>'+t.t568Names[ci].replace('/','/<wbr>')+'</small></div>'}).join("")+'</div>';
+    return '<div class="end"><h4>'+(k==="e1"?'1':'2')+' &middot; RJ-45</h4>'+tg+pins+'</div>';
+  }
+  $("#t568").innerHTML=end("e1")+end("e2")+'<div class="t568res" style="grid-column:1/-1" role="status">'+(T568S.e1===T568S.e2?t.t568Straight:t.t568Cross)+'</div>';
+}
+
+/* ---- cableado ---- */
+function renderCable(){
+  var t=L();
+  $("#cabSvg").innerHTML=svgBuilding(t);
+  $("#cabSubs").innerHTML=t.subs.map(function(s,i){return ACC((i+1)+'. '+s[0],'<p>'+s[1]+'</p>',i===1)}).join("");
+  $("#catTbl").innerHTML='<table class="cat"><thead><tr>'+t.catHead.map(function(h){return '<th>'+h+'</th>'}).join("")+'</tr></thead><tbody>'+t.catRows.map(function(r){return '<tr>'+r.map(function(c,i){return i?'<td>'+c+'</td>':'<td><strong>'+c+'</strong></td>'}).join("")+'</tr>'}).join("")+'</tbody></table>';
+  $("#galRack").innerHTML=svgRack(t);$("#galUtp").innerHTML=svgUtp(t);$("#galDc").innerHTML=svgDc(t);
+  renderT568();
+}
+
+/* ---- design wizard ---- */
+var DS={fl:4,per:20,pr:"bal"};
+function renderDesign(){
+  var t=L();
+  $("#dsForm").innerHTML='<div class="field"><label for="dsF">'+t.dsFloors+': <b id="dsFv">'+DS.fl+'</b></label><input type="range" id="dsF" min="1" max="12" value="'+DS.fl+'"></div>'
+   +'<div class="field"><label for="dsP">'+t.dsPer+': <b id="dsPv">'+DS.per+'</b></label><input type="range" id="dsP" min="4" max="48" value="'+DS.per+'"></div>'
+   +'<div class="field"><label>'+t.dsPrio+'</label><div class="chiprow">'+t.dsPrios.map(function(p){return '<button type="button" class="fchip" data-dsp="'+p[1]+'" aria-pressed="'+(DS.pr===p[1])+'">'+p[0]+'</button>'}).join("")+'</div></div>';
+  dsOut();
+}
+function dsOut(){
+  var t=L(),f=DS.fl,per=DS.per,pr=DS.pr;
+  var ports=Math.ceil(per*1.2),swF=Math.ceil(ports/24),acc=f*swF;
+  var core=pr==="ha"?2:1,bb=pr==="ha"?2*acc:acc;
+  var hz=f*per*30,bbm=bb*20,racks=f+1;
+  var cost=acc*900000+core*4500000+hz*COST.pm+bbm*8000+racks*1800000;
+  var T=function(v,l){return '<div class="tile"><b>'+v+'</b><span>'+l+'</span></div>'};
+  var nShow=Math.min(acc,8),w=520,svg='<svg viewBox="0 0 520 190" role="img" aria-label="'+escA(t.dsTopoNames[pr])+'" style="width:100%;height:auto;margin-top:8px;border-radius:14px;background:rgba(7,11,26,.5)">';
+  var cx=[];for(var i=0;i<nShow;i++)cx.push(40+i*(w-80)/Math.max(1,nShow-1));if(nShow===1)cx=[260];
+  var cores=core===2?[200,320]:[260];
+  cores.forEach(function(c){cx.forEach(function(x){svg+='<path d="M'+c+' 52L'+x+' 118" stroke="#FFD84D" stroke-width="1.6" opacity=".8"/>'})});
+  if(core===2)svg+='<path d="M200 36H320" stroke="#B38BFF" stroke-width="3"/>';
+  cores.forEach(function(c){svg+='<rect x="'+(c-34)+'" y="22" width="68" height="30" rx="7" fill="#16224A" stroke="#FFD84D" stroke-width="2"/><text x="'+c+'" y="41" text-anchor="middle" class="sv-tx b" style="font-size:11px">CORE</text>'});
+  cx.forEach(function(x,i){
+    svg+='<rect x="'+(x-22)+'" y="118" width="44" height="24" rx="5" fill="#16224A" stroke="#5EE0FF" stroke-width="1.6"/>';
+    for(var k=-1;k<=1;k++)svg+='<path d="M'+x+' 142L'+(x+k*14)+' 168" stroke="#7E90CC"/><circle cx="'+(x+k*14)+'" cy="172" r="4" fill="#5EE0FF"/>';
+  });
+  if(acc>nShow)svg+='<text x="260" y="105" text-anchor="middle" class="sv-tx">+ '+(acc-nShow)+'</text>';
+  svg+='</svg>';
+  $("#dsOut").innerHTML='<h3>'+t.dsRes+': '+t.dsTopoNames[pr]+'</h3><div class="why">'+t.dsWhy[pr]+'</div>'+svg
+   +'<div class="tiles">'+T(acc,t.dsSw)+T(core,t.dsCore)+T(hz.toLocaleString("es-CO")+' m',t.dsHz)+T(bb+' &times; 20 m',t.dsBb)+T(racks,t.dsRack)+T(cop(cost),t.dsCost)+'</div><p class="note">'+t.dsNote+'</p>';
+}
+
+/* ---- game ---- */
+var GM={goal:"star",links:{},sel:null,drag:null,msg:"",ok:false};
+var GP=[];(function(){for(var i=0;i<6;i++){var a=(-90+60*i)*Math.PI/180;GP.push([200+112*Math.cos(a),160+112*Math.sin(a)])}GP.push([200,160])})();
+function gk(a,b){return a<b?a+"-"+b:b+"-"+a}
+function gmExpected(){
+  var e={},i,j;
+  if(GM.goal==="star")for(i=0;i<6;i++)e[gk(i,6)]=1;
+  else if(GM.goal==="ring")for(i=0;i<6;i++)e[gk(i,(i+1)%6)]=1;
+  else for(i=0;i<6;i++)for(j=i+1;j<6;j++)e[gk(i,j)]=1;
+  return e;
+}
+function renderGame(){
+  var t=L(),h='<div class="chiprow">'+t.gmGoals.map(function(g){return '<button type="button" class="fchip" data-gmg="'+g[1]+'" aria-pressed="'+(GM.goal===g[1])+'">'+g[0]+'</button>'}).join("")+'</div>'
+   +'<p class="note" style="margin:10px 0 0">'+t.gmGoalTxt[GM.goal]+'</p><svg id="gmSvg" viewBox="0 0 400 320" role="group" aria-label="'+escA(t.gmTitle)+'"><g id="gmL"></g><line id="gmRb" stroke="#5EE0FF" stroke-width="2" stroke-dasharray="5 5" visibility="hidden"/><g id="gmN"></g></svg>'
+   +'<div class="row" style="align-items:center"><button type="button" class="btn small primary" data-gma="check">'+t.gmCheck+'</button><button type="button" class="btn small" data-gma="clear">'+t.gmClear+'</button><span class="gl-count" id="gmCnt"></span></div><p class="gmsg" id="gmMsg" role="status"></p>';
+  $("#gmBody").innerHTML=h;gmDraw();
+  $("#gmMsg").textContent=GM.msg;$("#gmMsg").className="gmsg"+(GM.ok?" ok":"");
+}
+function gmDraw(){
+  var L2="",N="",k;
+  for(k in GM.links){var p=k.split("-"),a=GP[+p[0]],b=GP[+p[1]];L2+='<line class="glink" x1="'+a[0]+'" y1="'+a[1]+'" x2="'+b[0]+'" y2="'+b[1]+'"/><line class="ghit" data-gl="'+k+'" x1="'+a[0]+'" y1="'+a[1]+'" x2="'+b[0]+'" y2="'+b[1]+'"/>'}
+  GP.forEach(function(p,i){
+    var sw=i===6;
+    N+='<g class="gnode'+(GM.sel===i?' sel':'')+'" data-n="'+i+'" tabindex="0" role="button" aria-label="'+(sw?'Switch':'PC '+(i+1))+'">'+(sw?'<rect x="'+(p[0]-26)+'" y="'+(p[1]-16)+'" width="52" height="32" rx="8" fill="#16224A" stroke="#FFD84D" stroke-width="2.5"/><text x="'+p[0]+'" y="'+(p[1]+5)+'" text-anchor="middle">SW</text>':'<circle cx="'+p[0]+'" cy="'+p[1]+'" r="20"/><text x="'+p[0]+'" y="'+(p[1]+5)+'" text-anchor="middle">'+(i+1)+'</text>')+'</g>';
+  });
+  $("#gmL").innerHTML=L2;$("#gmN").innerHTML=N;
+  var c=Object.keys(GM.links).length;$("#gmCnt").textContent=L().gmLinks+": "+c;
+}
+function gmToggle(a,b){var k=gk(a,b);if(GM.links[k])delete GM.links[k];else GM.links[k]=1;GM.msg="";GM.ok=false;beep(520,0.08,"sine",0.05);renderGameSoft()}
+function renderGameSoft(){gmDraw();$("#gmMsg").textContent="";$("#gmMsg").className="gmsg"}
+function gmCheck(){
+  var t=L(),e=gmExpected(),miss=0,extra=0,k;
+  for(k in e)if(!GM.links[k])miss++;
+  for(k in GM.links)if(!e[k])extra++;
+  if(!Object.keys(GM.links).length){GM.msg=t.gmMsg.none;GM.ok=false}
+  else if(!miss&&!extra){GM.msg=t.gmMsg.ok;GM.ok=true;beep(880,0.25,"sine",0.07)}
+  else{GM.msg=t.gmMsg[GM.goal](miss,extra);GM.ok=false}
+  $("#gmMsg").textContent=GM.msg;$("#gmMsg").className="gmsg"+(GM.ok?" ok":"");
+}
+function gmNodeAt(x,y){var el=document.elementFromPoint(x,y),g=el&&el.closest&&el.closest("[data-n]");return g?+g.getAttribute("data-n"):null}
+function wireGame(){
+  var host=$("#gmBody");
+  host.addEventListener("click",function(e){
+    var g=e.target.closest("[data-gmg]");if(g){GM.goal=g.getAttribute("data-gmg");GM.links={};GM.sel=null;GM.msg="";GM.ok=false;renderGame();return}
+    var a=e.target.closest("[data-gma]");if(a){if(a.getAttribute("data-gma")==="clear"){GM.links={};GM.sel=null;GM.msg="";GM.ok=false;renderGame()}else gmCheck();return}
+  });
+  host.addEventListener("pointerdown",function(e){
+    var l=e.target.closest("[data-gl]");if(l){delete GM.links[l.getAttribute("data-gl")];GM.msg="";renderGameSoft();e.preventDefault();return}
+    var n=e.target.closest("[data-n]");if(n){GM.drag=+n.getAttribute("data-n");e.preventDefault()}
+  });
+  document.addEventListener("pointermove",function(e){
+    if(GM.drag===null)return;
+    var svg=$("#gmSvg");if(!svg)return;var r=svg.getBoundingClientRect(),sx=400/r.width,sy=320/r.height,rb=$("#gmRb"),p=GP[GM.drag];
+    rb.setAttribute("x1",p[0]);rb.setAttribute("y1",p[1]);rb.setAttribute("x2",(e.clientX-r.left)*sx);rb.setAttribute("y2",(e.clientY-r.top)*sy);rb.setAttribute("visibility","visible");
+  });
+  document.addEventListener("pointerup",function(e){
+    if(GM.drag===null)return;
+    var d=GM.drag;GM.drag=null;var rb=$("#gmRb");if(rb)rb.setAttribute("visibility","hidden");
+    var n=gmNodeAt(e.clientX,e.clientY);if(n===null)return;
+    if(n!==d){gmToggle(d,n);GM.sel=null;gmDraw()}
+    else if(GM.sel!==null&&GM.sel!==n){gmToggle(GM.sel,n);GM.sel=null;gmDraw()}
+    else{GM.sel=GM.sel===n?null:n;gmDraw()}
+  });
+  host.addEventListener("keydown",function(e){
+    if(e.key!=="Enter"&&e.key!==" ")return;var n=e.target.closest("[data-n]");if(!n)return;e.preventDefault();var i=+n.getAttribute("data-n");
+    if(GM.sel!==null&&GM.sel!==i){gmToggle(GM.sel,i);GM.sel=null}else GM.sel=GM.sel===i?null:i;gmDraw();var q=$('[data-n="'+i+'"]');if(q)q.focus();
+  });
+}
+
+/* ---- search (Ctrl+K) ---- */
+var KS={idx:[],res:[],sel:0};
+function kBuild(){
+  var t=L(),x=[];
+  SECS.forEach(function(s){if(s[0]==="inicio")return;x.push({ty:"sec",t:t[s[1]],d:"",go:function(){kGo("#"+s[0])}})});
+  TYPES.forEach(function(ty){x.push({ty:"sec",t:TP[ty][lang].name,d:TP[ty][lang].tag,go:function(){kGo("#"+ty)}})});
+  t.gl.forEach(function(g){x.push({ty:"gl",t:g[0],d:g[1],x:g[3],go:function(){GL.cat=-1;GL.ltr="";$("#glQ").value="";renderGlossary();kGo("#glosario",function(){var el=$$("#glList .gl-it").filter(function(d){return d.getAttribute("data-term")===g[0]})[0];if(el){el.open=true;kFlash(el)}})}})});
+  t.faq.forEach(function(f,i){x.push({ty:"faq",t:f[0],d:f[1],go:function(){kGo("#faq",function(){var el=document.getElementById("q"+i);if(el){el.open=true;kFlash(el)}})}})});
+  t.timeline.forEach(function(e,i){x.push({ty:"hist",t:e[0]+" · "+e[1],d:e[2],x:e[4],go:function(){kGo("#historia",function(){var el=document.getElementById("h"+i);if(el){el.open=true;kFlash(el)}})}})});
+  t.refs.concat(t.refsExtra).forEach(function(r){x.push({ty:"ref",t:r[0],d:r[1],go:function(){kGo("#fuentes")}})});
+  KS.idx=x;
+}
+function kFlash(el){el.classList.remove("flash");void el.offsetWidth;el.classList.add("flash");el.scrollIntoView({behavior:"smooth",block:"center"})}
+function kGo(sel,after){kClose();var el=$(sel);if(el)el.scrollIntoView({behavior:"smooth",block:"start"});if(after)setTimeout(after,450)}
+function kOpen(){kBuild();$("#kov").hidden=false;$("#kIn").value="";kSearch();setTimeout(function(){$("#kIn").focus()},30)}
+function kClose(){$("#kov").hidden=true}
+function kSearch(){
+  var q=norm($("#kIn").value).trim(),t=L(),r=[];
+  if(!q){r=KS.idx.filter(function(i){return i.ty==="sec"}).slice(0,12)}
+  else{
+    KS.idx.forEach(function(i){
+      var a=norm(i.t),b=norm(i.d||""),c=norm(i.x||""),s=0;
+      if(a.indexOf(q)===0)s=4;else if(a.indexOf(q)>=0)s=3;else if(b.indexOf(q)>=0)s=2;else if(c.indexOf(q)>=0)s=1;
+      if(s)r.push({i:i,s:s});
+    });
+    r.sort(function(p,q2){return q2.s-p.s});r=r.slice(0,12).map(function(z){return z.i});
+  }
+  KS.res=r;KS.sel=0;
+  $("#kRes").innerHTML=r.length?r.map(function(i,n){return '<li role="option" data-k="'+n+'" aria-selected="'+(n===0)+'"><em>'+t.kTypes[i.ty]+'</em><span><b>'+i.t+'</b>'+(i.d?'<small>'+i.d+'</small>':'')+'</span></li>'}).join(""):'<li style="cursor:default">'+t.kNone+'</li>';
+}
+function kMove(d){
+  if(!KS.res.length)return;KS.sel=(KS.sel+d+KS.res.length)%KS.res.length;
+  $$("#kRes li").forEach(function(li,n){li.setAttribute("aria-selected",n===KS.sel);if(n===KS.sel)li.scrollIntoView({block:"nearest"})});
+}
+function wireSearch(){
+  $("#kBtn").addEventListener("click",kOpen);
+  $("#kIn").addEventListener("input",kSearch);
+  $("#kov").addEventListener("click",function(e){if(e.target.id==="kov")kClose()});
+  $("#kRes").addEventListener("click",function(e){var li=e.target.closest("[data-k]");if(li&&KS.res[+li.getAttribute("data-k")])KS.res[+li.getAttribute("data-k")].go()});
+  document.addEventListener("keydown",function(e){
+    if((e.ctrlKey||e.metaKey)&&(e.key==="k"||e.key==="K")){e.preventDefault();$("#kov").hidden?kOpen():kClose();return}
+    if($("#kov").hidden)return;
+    if(e.key==="Escape"){kClose();$("#kBtn").focus()}
+    else if(e.key==="ArrowDown"){e.preventDefault();kMove(1)}
+    else if(e.key==="ArrowUp"){e.preventDefault();kMove(-1)}
+    else if(e.key==="Enter"){e.preventDefault();var r=KS.res[KS.sel];if(r)r.go()}
+  },true);
+}
+
+/* ---- wiring ---- */
+function wireV6(){
+  document.addEventListener("click",function(e){
+    var a=e.target.closest("[data-accact]");
+    if(a){var bar=a.closest(".acc-bar"),tg=$(bar.getAttribute("data-for")),open=a.getAttribute("data-accact")==="open";$$("details",tg).forEach(function(d){d.open=open});return}
+    var c=e.target.closest("[data-glc]");if(c){GL.cat=+c.getAttribute("data-glc");GL.ltr="";renderGlossary();return}
+    var l=e.target.closest("[data-gll]");if(l){var v=l.getAttribute("data-gll");GL.ltr=GL.ltr===v?"":v;renderGlossary();return}
+    var tt=e.target.closest("[data-t568]");if(tt){var p=tt.getAttribute("data-t568").split(":");T568S[p[0]]=p[1];renderT568();return}
+    var d=e.target.closest("[data-dsp]");if(d){DS.pr=d.getAttribute("data-dsp");renderDesign();return}
+  });
+  document.addEventListener("input",function(e){
+    if(e.target.id==="dsF"){DS.fl=+e.target.value;$("#dsFv").textContent=DS.fl;dsOut()}
+    else if(e.target.id==="dsP"){DS.per=+e.target.value;$("#dsPv").textContent=DS.per;dsOut()}
+  });
+  wireGame();wireSearch();
+  try{new IntersectionObserver(function(en){if(en[0].isIntersecting)runStats()},{threshold:.3}).observe($("#stats"))}catch(e){runStats()}
+}
+function renderV6(){
+  renderFaq();renderRefs();renderStats();renderCable();renderDesign();renderGame();renderAccBars();
+  if(STATS_DONE)$$("#stats b").forEach(function(b){b.textContent=b.getAttribute("data-to")});
+}
+
+wireCost();wireLearn();wireNav();wireV6();
 
 wireSim();
 applyLang();
