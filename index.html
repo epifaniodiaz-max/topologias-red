@@ -10,6 +10,7 @@
 <meta property="og:description" content="Bus, estrella, anillo, malla y árbol con simulador de fallas, laboratorio de costos y confiabilidad, historia y quiz. Bilingüe ES/EN.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#070B1A">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 28 28%27%3E%3Crect width=%2728%27 height=%2728%27 rx=%276%27 fill=%27%23070B1A%27/%3E%3Cpath d=%27M6 8 L22 6 L14 22 Z%27 fill=%27none%27 stroke=%27%235EE0FF%27 stroke-width=%271.8%27 stroke-linejoin=%27round%27/%3E%3Ccircle cx=%276%27 cy=%278%27 r=%273%27 fill=%27%235EE0FF%27/%3E%3Ccircle cx=%2722%27 cy=%276%27 r=%273%27 fill=%27%23B38BFF%27/%3E%3Ccircle cx=%2714%27 cy=%2722%27 r=%273%27 fill=%27%232EE6A6%27/%3E%3C/svg%3E">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
 <style>
 /* Layout: glass top bar, a saturated gradient hero with a live network canvas, four chapter panels that each own one cable color (bus amber, star emerald, ring blue, mesh magenta), and the failure simulator as a neon control room. One committed dark world, no light variant. */
@@ -428,11 +429,26 @@ body.pres .dots-nav{display:none}
 .cgrid dt{font:500 .72rem var(--font-mono);text-transform:uppercase;letter-spacing:.1em;color:var(--accent)}
 .cgrid dd{margin:2px 0 0;font-weight:500}
 @media(max-width:720px){.cred{grid-template-columns:minmax(0,1fr)}.cgrid{grid-template-columns:minmax(0,1fr)}.clogo{width:110px;height:110px}}
+
+/* v4 fixes and extras */
+.gcard:hover,.gcard:focus-within{z-index:8;position:relative}
+.gcard abbr.gl::after{left:0;transform:translateY(4px);max-width:min(260px,64vw)}
+.gcard abbr.gl:hover::after,.gcard abbr.gl:focus::after{transform:none}
+.gcard:nth-child(3n) abbr.gl::after{left:auto;right:0}
+@media(max-width:960px){.gcard:nth-child(3n) abbr.gl::after{left:0;right:auto}.gcard:nth-child(2n) abbr.gl::after{left:auto;right:0}}
+.skip{position:absolute;left:-999px;top:8px;z-index:100;padding:10px 16px;border-radius:10px;background:var(--accent);color:var(--on-accent);font-weight:600;text-decoration:none}
+.skip:focus{left:12px}
+.citebox{margin-top:18px;padding:16px 18px;border-radius:16px;background:rgba(7,11,26,.5);border:1px solid rgba(150,170,255,.2)}
+.citebox p{margin:8px 0 12px;font-size:.93rem;color:#D4DDF5;max-width:none;padding-left:2.2em;text-indent:-2.2em;word-break:break-word}
+.tbtn[data-busy="1"]{opacity:.6}
+@media(max-width:620px){#presBtn{display:none}}
 </style>
 
 </head>
 <body>
+<a class="skip" href="#intro" data-i="skip"></a>
 <div id="prog" aria-hidden="true"></div>
+<audio id="bgm" loop preload="none" src="musica.mp3"></audio>
 <nav class="dots-nav" id="dotsNav" data-ia="aDots"></nav>
 <header class="bar">
   <a class="brand" href="#inicio"><svg width="30" height="30" viewBox="0 0 28 28" aria-hidden="true"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5EE0FF"/><stop offset="1" stop-color="#B38BFF"/></linearGradient></defs><path d="M6 8 L22 6 L14 22 Z" fill="none" stroke="url(#lg)" stroke-width="2" stroke-linejoin="round"/><circle cx="6" cy="8" r="3.2" fill="url(#lg)"/><circle cx="22" cy="6" r="3.2" fill="url(#lg)"/><circle cx="14" cy="22" r="3.2" fill="url(#lg)"/></svg><span data-i="brand"></span></a>
@@ -441,6 +457,7 @@ body.pres .dots-nav{display:none}
   </nav>
   <div class="tools">
     <button class="tbtn" id="presBtn" type="button" data-i="presBtn"></button>
+    <button class="tbtn" id="musBtn" type="button" data-ia="aMus" aria-pressed="false">♫ OFF</button>
     <button class="tbtn" id="sndBtn" type="button" data-ia="aSnd" aria-pressed="false">♪ OFF</button>
     <button class="tbtn" id="langBtn" type="button" data-ia="aLang">ES | EN</button>
   </div>
@@ -615,6 +632,7 @@ body.pres .dots-nav{display:none}
   <section id="fuentes">
     <div class="sec-head"><span class="label" data-i="nSrc"></span><h2 data-i="srcTitle"></h2><p data-i="srcIntro"></p></div>
     <ul class="refs" id="refList"></ul>
+    <p class="note" data-i="refNote"></p>
     <div class="card books">
       <h3 data-i="bookTitle"></h3>
       <p data-i="book1"></p><p data-i="book2"></p><p data-i="book3"></p>
@@ -627,6 +645,11 @@ body.pres .dots-nav{display:none}
         <span class="label" data-i="credLabel"></span>
         <h2 data-i="credTitle"></h2>
         <dl class="cgrid" id="credList"></dl>
+        <div class="citebox">
+          <span class="label" data-i="citeLabel"></span>
+          <p id="citeTxt"></p>
+          <div class="row"><button type="button" class="btn small" id="copyCite" data-i="copyCite"></button><button type="button" class="btn small" id="copyLink" data-i="copyLink"></button><a class="btn small" href="#inicio" data-i="toTop"></a></div>
+        </div>
       </div>
     </div>
   </section>
@@ -1382,8 +1405,14 @@ function renderIntro(){
   $("#objList").innerHTML=t.objs.map(function(o){return '<li><b>'+o[0]+'</b><span>'+o[1]+'</span></li>'}).join("");
   $("#gearGrid").innerHTML=t.gear.map(function(g,i){return '<div class="gcard tilt t-'+GEAR_TY[i]+'">'+GEAR_SVG[i]+'<h3>'+g[0]+'</h3><p>'+g[1]+'</p></div>'}).join("");
 }
+function citeText(){
+  var u=location.href.split("#")[0];
+  return lang==="es"?"Díaz Rodríguez, E. A., Niño, A. F., & Carrero, S. F. (2026). Topologías de red físicas [Sitio web]. Corporación Unificada Nacional de Educación Superior. "+u
+   :"Díaz Rodríguez, E. A., Niño, A. F., & Carrero, S. F. (2026). Topologías de red físicas [Website]. Corporación Unificada Nacional de Educación Superior. "+u;
+}
 function renderCred(){
   var t=L();
+  $("#citeTxt").innerHTML=citeText().replace("Topologías de red físicas","<i>Topologías de red físicas</i>");
   $("#credList").innerHTML=t.cred.map(function(c){return '<div><dt>'+c[0]+'</dt><dd>'+c[1]+'</dd></div>'}).join("");
 }
 function renderTimeline(){
@@ -1743,6 +1772,40 @@ Object.assign(I.en,{
  foot1:"CUN · Systems Engineering · Structured cabling · Class 54448 · 2026-2",
  foot2:"Epifanio Alberto Díaz Rodríguez, Andrés Felipe Niño and Sebastián Felipe Carrero · Instructor: Danilo Andrés Rincón"
 });
+
+/* ===== v4: background music, copy buttons ===== */
+Object.assign(I.es,{
+ aMus:"Activar o silenciar la música de fondo",skip:"Saltar al contenido",
+ citeLabel:"Cómo citar esta página (APA 7)",copyCite:"Copiar cita",copyLink:"Copiar enlace",toTop:"Volver arriba",copied:"¡Copiado!",
+ refNote:"Fuentes consultadas el 4 de noviembre de 2026. Los enlaces se abren en una pestaña nueva."
+});
+Object.assign(I.en,{
+ aMus:"Turn background music on or off",skip:"Skip to content",
+ citeLabel:"How to cite this page (APA 7)",copyCite:"Copy citation",copyLink:"Copy link",toTop:"Back to top",copied:"Copied!",
+ refNote:"Sources consulted on November 4, 2026. Links open in a new tab."
+});
+var MUS={on:false,tm:null};
+function musBtn(){var b=$("#musBtn");b.classList.toggle("on",MUS.on);b.setAttribute("aria-pressed",MUS.on?"true":"false");b.textContent=MUS.on?"♫ ON":"♫ OFF"}
+function musFade(to,ms,done){
+  var a=$("#bgm");clearInterval(MUS.tm);var from=a.volume,t0=Date.now();
+  MUS.tm=setInterval(function(){var k=Math.min(1,(Date.now()-t0)/ms);a.volume=Math.max(0,Math.min(1,from+(to-from)*k));if(k>=1){clearInterval(MUS.tm);if(done)done()}},40);
+}
+$("#musBtn").addEventListener("click",function(){
+  var a=$("#bgm");
+  if(!MUS.on){
+    a.volume=0;
+    var p=a.play();
+    var ok=function(){MUS.on=true;musBtn();musFade(0.32,1800)};
+    if(p&&p.then)p.then(ok,function(){MUS.on=false;musBtn()});else ok();
+  }else{MUS.on=false;musBtn();musFade(0,900,function(){a.pause()})}
+});
+function copyTxt(txt,btn){
+  var done=function(){var o=btn.textContent;btn.textContent=L().copied;setTimeout(function(){btn.textContent=o},1600)};
+  try{navigator.clipboard.writeText(txt).then(done,function(){fb()})}catch(e){fb()}
+  function fb(){var x=document.createElement("textarea");x.value=txt;x.style.position="fixed";x.style.opacity="0";document.body.appendChild(x);x.select();try{document.execCommand("copy")}catch(e){}document.body.removeChild(x);done()}
+}
+$("#copyCite").addEventListener("click",function(e){copyTxt(citeText(),e.currentTarget)});
+$("#copyLink").addEventListener("click",function(e){copyTxt(location.href.split("#")[0],e.currentTarget)});
 wireCost();wireLearn();wireNav();
 
 wireSim();
