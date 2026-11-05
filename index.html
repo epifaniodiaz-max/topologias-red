@@ -1,0 +1,1755 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Topologías de Red Físicas</title>
+<meta name="description" content="Topologías de red físicas: bus, estrella, anillo, malla y árbol. Simulador de fallas, laboratorio y quiz. Physical network topologies, bilingual.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Topologías de Red Físicas · Physical Network Topologies">
+<meta property="og:description" content="Bus, estrella, anillo, malla y árbol con simulador de fallas, laboratorio de costos y confiabilidad, historia y quiz. Bilingüe ES/EN.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#070B1A">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: glass top bar, a saturated gradient hero with a live network canvas, four chapter panels that each own one cable color (bus amber, star emerald, ring blue, mesh magenta), and the failure simulator as a neon control room. One committed dark world, no light variant. */
+:root{
+  --font-display:"Poppins","Segoe UI",system-ui,sans-serif;
+  --font-body:"Inter","Segoe UI",system-ui,sans-serif;
+  --font-mono:"JetBrains Mono","DejaVu Sans Mono",ui-monospace,Menlo,Consolas,monospace;
+  --bg:#070B1A; --bg-2:#0B1230; --surface:#0F1836; --surface-2:#16224A; --surface-3:#1E2D61;
+  --fg:#F1F4FF; --muted:#A9B5DA; --line:#27376B; --line-strong:#5E73BA;
+  --accent:#5EE0FF; --accent-2:#B38BFF; --on-accent:#04202B;
+  --bus:#FFB347; --bus2:#FF6B4A; --star:#2EE6A6; --star2:#18B6F0;
+  --ring:#5B93FF; --ring2:#9B6BFF; --mesh:#E26BFF; --mesh2:#FF5C9A;
+  --good:#2EE6A6; --warn:#FFC857; --bad:#FF6B6B;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{overflow-x:clip}
+[hidden]{display:none!important}
+html{scroll-behavior:smooth;scroll-padding-top:92px}
+body{margin:0;color:var(--fg);font:400 17px/1.62 var(--font-body);
+  background:
+    radial-gradient(1100px 700px at 100% 0%,rgba(155,107,255,.20),transparent 60%),
+    radial-gradient(900px 700px at 0% 38%,rgba(24,182,240,.12),transparent 60%),
+    radial-gradient(900px 700px at 100% 78%,rgba(226,107,255,.12),transparent 60%),
+    var(--bg);
+  background-attachment:fixed;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--bg)}
+.wrap{max-width:1180px;margin:0 auto}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+h1,h2,h3{font-family:var(--font-display);line-height:1.1;margin:0;text-wrap:balance;letter-spacing:-.015em}
+h1{font-size:clamp(2.5rem,6vw,4.7rem);font-weight:700}
+h2{font-size:clamp(1.8rem,3.4vw,2.6rem);font-weight:700}
+h3{font-size:1.18rem;font-weight:600}
+p{margin:0 0 1em;max-width:66ch}
+.label{font:500 .76rem/1.2 var(--font-mono);text-transform:uppercase;letter-spacing:.11em;color:var(--accent)}
+.t-bus{--c:var(--bus);--c2:var(--bus2)} .t-star{--c:var(--star);--c2:var(--star2)}
+.t-ring{--c:var(--ring);--c2:var(--ring2)} .t-mesh{--c:var(--mesh);--c2:var(--mesh2)}
+.gtext{background:linear-gradient(95deg,var(--c),var(--c2));-webkit-background-clip:text;background-clip:text;color:transparent}
+
+/* top bar */
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;display:flex;align-items:center;gap:20px;padding:12px 18px;margin-top:14px;border-radius:16px;
+  background:rgba(10,16,42,.72);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(150,170,255,.20)}
+.brand{display:flex;align-items:center;gap:10px;font:600 1.02rem var(--font-display);color:var(--fg);text-decoration:none;white-space:nowrap}
+.bar nav{display:flex;gap:2px;margin-left:auto;overflow-x:auto}
+.bar nav a{padding:7px 12px;border-radius:9px;text-decoration:none;color:var(--muted);font-size:.92rem;font-weight:500;white-space:nowrap;transition:background .15s,color .15s}
+.bar nav a:hover{color:#fff;background:rgba(150,170,255,.14)}
+.tools{display:flex;gap:8px}
+.tbtn{font:600 .84rem var(--font-mono);padding:8px 13px;border-radius:9px;border:1px solid rgba(150,170,255,.30);background:rgba(255,255,255,.05);color:var(--fg);cursor:pointer;transition:border-color .15s,background .15s}
+.tbtn:hover{border-color:var(--accent);background:rgba(94,224,255,.10)}
+@media(max-width:820px){.bar nav{display:none}.bar{justify-content:space-between}}
+@media(max-width:620px){.bar{gap:8px;padding:9px 10px}.brand span{display:none}.tools{gap:6px}.tbtn{padding:7px 9px;font-size:.76rem}}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 20px;border-radius:12px;border:1px solid rgba(160,180,255,.30);background:rgba(255,255,255,.06);color:var(--fg);font:600 .95rem var(--font-body);text-decoration:none;cursor:pointer;transition:transform .15s,border-color .15s,background .15s,box-shadow .15s}
+.btn:hover{transform:translateY(-2px);border-color:var(--accent);background:rgba(94,224,255,.12)}
+.btn.primary{background:linear-gradient(135deg,var(--accent),var(--accent-2));color:var(--on-accent);border-color:transparent;box-shadow:0 10px 30px -10px rgba(94,224,255,.7)}
+.btn.primary:hover{box-shadow:0 14px 36px -8px rgba(179,139,255,.85)}
+.btn.small{padding:9px 14px;font-size:.88rem;border-radius:10px}
+.btn[disabled]{opacity:.5;cursor:default;transform:none}
+.row{display:flex;flex-wrap:wrap;gap:10px}
+
+/* hero */
+.hero{position:relative;margin-top:22px;border-radius:30px;overflow:hidden;border:1px solid rgba(140,160,255,.28);
+  background:
+    radial-gradient(900px 520px at 90% -10%,rgba(155,107,255,.70),transparent 60%),
+    radial-gradient(760px 520px at -4% 110%,rgba(24,182,240,.50),transparent 62%),
+    radial-gradient(520px 320px at 62% 105%,rgba(226,107,255,.34),transparent 70%),
+    linear-gradient(135deg,#0A1238,#111C52 55%,#1B1257);
+  box-shadow:0 50px 100px -50px rgba(91,147,255,.65)}
+.hero canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.hero::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(7,11,26,.80) 0%,rgba(7,11,26,.46) 46%,transparent 82%);pointer-events:none}
+.hero-in{position:relative;z-index:1;padding:clamp(36px,6.5vw,84px) clamp(22px,5vw,64px);display:grid;gap:24px;max-width:780px}
+.hero h1{background:linear-gradient(100deg,#fff 0%,#C9D8FF 42%,var(--accent) 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero .lead{font-size:1.22rem;color:#C5D0F0;max-width:52ch;margin:0}
+.chips{display:flex;flex-wrap:wrap;gap:10px}
+.chip{display:inline-flex;align-items:center;gap:10px;padding:9px 17px;border-radius:999px;color:#fff;text-decoration:none;font:600 .9rem var(--font-body);
+  background:linear-gradient(135deg,color-mix(in srgb,var(--c) 32%,transparent),color-mix(in srgb,var(--c2) 20%,transparent));
+  border:1px solid color-mix(in srgb,var(--c) 60%,transparent);transition:transform .15s,box-shadow .15s}
+.chip i{width:10px;height:10px;border-radius:50%;background:linear-gradient(135deg,var(--c),var(--c2));box-shadow:0 0 10px var(--c)}
+.chip:hover{transform:translateY(-2px);box-shadow:0 10px 26px -10px var(--c)}
+@media(max-width:700px){.hero::after{background:rgba(7,11,26,.62)}}
+
+section{padding-block:clamp(36px,5.5vw,68px)}
+.sec-head{display:grid;gap:12px;margin-bottom:30px}
+.sec-head p{color:var(--muted)}
+
+/* fundamentals */
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(24px,4vw,56px);align-items:start}
+@media(max-width:860px){.two{grid-template-columns:minmax(0,1fr)}}
+.tbl-scroll{overflow-x:auto;border:1px solid rgba(150,170,255,.22);border-radius:18px;background:rgba(15,24,54,.72)}
+table{border-collapse:collapse;width:100%}
+th,td{padding:13px 16px;text-align:left;border-bottom:1px solid rgba(150,170,255,.14);font-size:.95rem;vertical-align:top}
+th{font:500 .74rem var(--font-mono);text-transform:uppercase;letter-spacing:.1em;color:var(--accent);background:rgba(94,224,255,.07)}
+tr:last-child td{border-bottom:0}
+.crit{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin-top:36px}
+.ccard{padding:20px;border-radius:18px;background:linear-gradient(160deg,color-mix(in srgb,var(--c) 30%,var(--surface)),var(--surface) 72%);border:1px solid color-mix(in srgb,var(--c) 45%,transparent)}
+.ccard h3{margin-bottom:6px;color:var(--c)}
+.ccard p{color:var(--muted);font-size:.94rem;margin:0}
+@media(max-width:860px){.crit{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}}
+@media(max-width:480px){.crit{grid-template-columns:minmax(0,1fr)}}
+
+/* chapters */
+#topologias{padding-top:20px}
+.chapter{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:clamp(24px,4vw,56px);align-items:start;padding:clamp(24px,4vw,52px);margin-block:30px;border-radius:30px;
+  background:
+    radial-gradient(900px 420px at 8% 0%,color-mix(in srgb,var(--c) 26%,transparent),transparent 62%),
+    radial-gradient(700px 400px at 100% 100%,color-mix(in srgb,var(--c2) 18%,transparent),transparent 62%),
+    linear-gradient(180deg,var(--surface),var(--bg-2));
+  border:1px solid color-mix(in srgb,var(--c) 42%,transparent);
+  box-shadow:0 40px 90px -50px color-mix(in srgb,var(--c) 70%,transparent)}
+.chapter.rev .ch-vis{order:2}
+.ch-vis{position:sticky;top:96px}
+@media(max-width:860px){.chapter{grid-template-columns:minmax(0,1fr)}.chapter.rev .ch-vis{order:0}.ch-vis{position:static}}
+.card{background:rgba(15,24,54,.78);border:1px solid rgba(150,170,255,.22);border-radius:20px}
+.diagram{padding:10px;border-radius:22px;
+  background:
+    radial-gradient(circle at 1px 1px,rgba(150,170,255,.20) 1px,transparent 1.3px) 0 0/22px 22px,
+    radial-gradient(420px 280px at 50% 42%,color-mix(in srgb,var(--c) 24%,transparent),transparent 72%),
+    var(--surface);
+  border:1px solid color-mix(in srgb,var(--c) 50%,transparent);
+  box-shadow:0 30px 70px -34px color-mix(in srgb,var(--c) 85%,transparent)}
+.diagram svg,.simsvg{display:block;width:100%;height:auto}
+.sheet{display:grid;grid-template-columns:auto minmax(0,1fr);gap:9px 16px;margin:14px 10px 8px;font-size:.9rem}
+.sheet dt{font:500 .72rem var(--font-mono);text-transform:uppercase;letter-spacing:.08em;color:var(--c);padding-top:3px}
+.sheet dd{margin:0;color:#DCE3FA}
+.ch-kicker{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.ch-kicker i{width:13px;height:13px;border-radius:50%;background:linear-gradient(135deg,var(--c),var(--c2));box-shadow:0 0 14px var(--c)}
+.ch-kicker .label{color:var(--c)}
+.ch-txt h2{background:linear-gradient(95deg,#fff 10%,var(--c) 70%,var(--c2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.ch-tag{font:500 1.3rem/1.25 var(--font-display);color:var(--c);margin:12px 0 18px}
+.pc{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px;margin:22px 0}
+@media(max-width:560px){.pc{grid-template-columns:minmax(0,1fr)}}
+.pc>div{padding:16px 18px;border-radius:16px;background:rgba(7,11,26,.42);border:1px solid rgba(150,170,255,.14)}
+.pc h4,.uses h4{margin:0 0 10px;font:500 .76rem var(--font-mono);text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+ul.pm,ul.us{list-style:none;margin:0;padding:0;display:grid;gap:9px}
+ul.pm li,ul.us li{position:relative;padding-left:22px;font-size:.96rem;line-height:1.45}
+ul.pm.pro li::before{content:"+";position:absolute;left:0;top:0;font:700 1rem var(--font-mono);color:var(--good)}
+ul.pm.con li::before{content:"\2212";position:absolute;left:0;top:0;font:700 1rem var(--font-mono);color:var(--bad)}
+ul.us li::before{content:"";position:absolute;left:3px;top:.55em;width:8px;height:8px;border-radius:50%;background:linear-gradient(135deg,var(--c),var(--c2));box-shadow:0 0 8px var(--c)}
+.uses{margin-bottom:22px}
+.ch-txt .btn{border-color:color-mix(in srgb,var(--c) 60%,transparent);background:color-mix(in srgb,var(--c) 16%,transparent)}
+.ch-txt .btn:hover{background:color-mix(in srgb,var(--c) 30%,transparent);border-color:var(--c)}
+
+/* svg shared */
+.lk{stroke:var(--line-strong);stroke-width:2.5;fill:none;stroke-linecap:round}
+.lk.bb{stroke-width:6;stroke:var(--c);filter:drop-shadow(0 0 6px var(--c))}
+.nd{fill:var(--surface-2);stroke:var(--c);stroke-width:3;filter:drop-shadow(0 0 7px color-mix(in srgb,var(--c) 80%,transparent))}
+.hubr{fill:var(--c);filter:drop-shadow(0 0 10px var(--c))}
+.nt{font:600 12px var(--font-mono);fill:#fff;text-anchor:middle;dominant-baseline:central;pointer-events:none}
+.ht{font:700 11px var(--font-mono);fill:#06101F;text-anchor:middle;dominant-baseline:central;pointer-events:none}
+.tapd{fill:var(--c)}
+.trm{fill:#fff}
+.trt{font:500 10px var(--font-mono);fill:var(--muted);text-anchor:middle}
+.pk{fill:#fff;filter:drop-shadow(0 0 6px var(--c)) drop-shadow(0 0 2px var(--c))}
+
+/* simulator */
+#simulador{border-radius:30px;padding:clamp(24px,4vw,52px);margin-block:30px;
+  background:
+    radial-gradient(800px 420px at 100% 0%,rgba(226,107,255,.26),transparent 60%),
+    radial-gradient(700px 420px at 0% 100%,rgba(46,230,166,.18),transparent 60%),
+    linear-gradient(135deg,#0D1640,#150F3C);
+  border:1px solid rgba(160,180,255,.28);box-shadow:0 50px 100px -50px rgba(155,107,255,.6)}
+.sim{display:grid;grid-template-columns:minmax(0,3fr) minmax(0,2fr);gap:22px;align-items:start}
+@media(max-width:900px){.sim{grid-template-columns:minmax(0,1fr)}}
+.sim-card{padding:12px;background:
+  radial-gradient(circle at 1px 1px,rgba(150,170,255,.18) 1px,transparent 1.3px) 0 0/24px 24px,
+  radial-gradient(520px 340px at 50% 45%,color-mix(in srgb,var(--c) 20%,transparent),transparent 72%),var(--surface);
+  border-color:color-mix(in srgb,var(--c) 50%,transparent)}
+.ctl{padding:20px;display:grid;gap:18px}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg button{font:600 .9rem var(--font-body);padding:9px 15px;border-radius:10px;border:1px solid rgba(160,180,255,.25);background:rgba(255,255,255,.05);color:var(--fg);cursor:pointer;transition:background .15s}
+.seg button:hover{background:rgba(255,255,255,.12)}
+.seg button[aria-pressed="true"]{background:linear-gradient(135deg,var(--c),var(--c2));border-color:transparent;color:#06101F}
+.seg.modes button[aria-pressed="true"]{background:#fff;border-color:#fff;color:#06101F}
+.metrics{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.metric{padding:11px 13px;border-radius:12px;background:rgba(7,11,26,.5);border:1px solid rgba(150,170,255,.14)}
+.metric b{display:block;font:700 1.65rem/1.1 var(--font-display);font-variant-numeric:tabular-nums;color:var(--c)}
+.metric span{font-size:.8rem;color:var(--muted)}
+.state{display:flex;align-items:center;gap:10px;font-weight:600;padding:11px 14px;border-radius:12px;background:color-mix(in srgb,var(--good) 18%,var(--surface-2));border:1px solid color-mix(in srgb,var(--good) 50%,transparent)}
+.state i{width:11px;height:11px;border-radius:50%;background:var(--good);box-shadow:0 0 10px var(--good);flex:none}
+.state[data-s="degraded"]{background:color-mix(in srgb,var(--warn) 18%,var(--surface-2));border-color:color-mix(in srgb,var(--warn) 55%,transparent)}
+.state[data-s="degraded"] i{background:var(--warn);box-shadow:0 0 10px var(--warn)}
+.state[data-s="down"]{background:color-mix(in srgb,var(--bad) 20%,var(--surface-2));border-color:color-mix(in srgb,var(--bad) 60%,transparent)}
+.state[data-s="down"] i{background:var(--bad);box-shadow:0 0 10px var(--bad)}
+.rule{font-size:.92rem;color:var(--muted);margin:0}
+.log{min-height:3.4em;font:400 .84rem/1.45 var(--font-mono);background:rgba(7,11,26,.6);color:#CFE9FF;padding:11px 13px;border-radius:12px;margin:0;border:1px solid rgba(150,170,255,.14)}
+.hintline{font-size:.9rem;color:var(--muted);margin:12px 6px 4px}
+.slk{stroke:var(--line-strong);stroke-width:3;fill:none;stroke-linecap:round}
+.slk.bb{stroke-width:7}
+.slk.dual{stroke-width:9}
+.slk.inner{stroke:var(--surface);stroke-width:3}
+.slk.on{stroke:var(--c);filter:drop-shadow(0 0 5px var(--c))}
+.slk.bad{stroke:var(--bad);stroke-dasharray:3 7}
+.hit{stroke:transparent;stroke-width:18;fill:none;pointer-events:stroke;cursor:pointer}
+.sx{stroke:var(--bad);stroke-width:3.5;stroke-linecap:round;filter:drop-shadow(0 0 5px var(--bad))}
+.snd{fill:var(--surface-2);stroke:var(--line-strong);stroke-width:3;cursor:pointer}
+.snd.up{stroke:var(--c);filter:drop-shadow(0 0 9px var(--c))}
+.snd.iso{stroke:var(--warn);stroke-dasharray:4 4}
+.snd.bad{stroke:var(--bad);fill:#2A1530}
+.shub{fill:var(--line-strong);cursor:pointer}
+.shub.up{fill:var(--c);filter:drop-shadow(0 0 12px var(--c))}
+.shub.bad{fill:var(--bad)}
+g[data-node]:focus-visible .snd,g[data-node]:focus-visible .shub{stroke:var(--accent);stroke-width:4}
+g[data-node]{outline:none}
+.spkt{fill:#fff;stroke:var(--c);stroke-width:2;filter:drop-shadow(0 0 10px #fff)}
+
+/* comparison */
+#comparativa{border-radius:30px;padding:clamp(24px,4vw,52px);margin-block:30px;
+  background:radial-gradient(800px 400px at 0% 0%,rgba(24,182,240,.18),transparent 62%),radial-gradient(700px 400px at 100% 100%,rgba(226,107,255,.16),transparent 62%),linear-gradient(180deg,var(--surface),var(--bg-2));
+  border:1px solid rgba(160,180,255,.24)}
+.cmp{min-width:860px}
+.cmp th.tc{color:#fff;background:linear-gradient(180deg,color-mix(in srgb,var(--c) 42%,transparent),color-mix(in srgb,var(--c2) 12%,transparent))}
+.cmp td.v{white-space:nowrap}
+.dots i{display:inline-block;width:11px;height:11px;border-radius:50%;background:rgba(150,170,255,.20);margin-right:4px}
+.dots i.on{background:linear-gradient(135deg,var(--c),var(--c2));box-shadow:0 0 9px var(--c)}
+.note{font-size:.88rem;color:var(--muted);margin:12px 4px 0}
+
+/* calculator */
+.calc{padding:24px;margin-top:28px;display:grid;gap:18px}
+.calc input[type=range]{width:100%;accent-color:var(--accent)}
+.calc-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.calc-head b{font:700 2.2rem var(--font-display);font-variant-numeric:tabular-nums;background:linear-gradient(95deg,var(--accent),var(--accent-2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.crow{display:grid;gap:7px;padding-top:14px;border-top:1px solid rgba(150,170,255,.16)}
+.crow h3{font-size:1rem;color:var(--c)}
+.bl{display:grid;grid-template-columns:150px minmax(0,1fr) 130px;gap:12px;align-items:center;font-size:.88rem;color:var(--muted)}
+.bl span:last-child{font:500 .85rem var(--font-mono);font-variant-numeric:tabular-nums;color:var(--fg)}
+.bar-t{height:11px;border-radius:7px;background:rgba(150,170,255,.14);overflow:hidden}
+.bar-t span{display:block;height:100%;background:linear-gradient(90deg,var(--c),var(--c2));border-radius:7px;box-shadow:0 0 12px var(--c);transition:width .3s}
+@media(max-width:560px){.bl{grid-template-columns:minmax(0,1fr) 100px}.bl .bn{grid-column:1/-1}}
+
+/* hybrids, conclusions, sources */
+.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin-top:28px}
+.cards .card{padding:22px}
+.cards .hc{background:linear-gradient(160deg,color-mix(in srgb,var(--c) 30%,var(--surface)),var(--surface) 70%);border-color:color-mix(in srgb,var(--c) 45%,transparent)}
+.cards h3{margin-bottom:8px;color:var(--c)}
+.cards p{font-size:.95rem;color:#C0CBEA;margin:0}
+@media(max-width:960px){.cards{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}}
+@media(max-width:520px){.cards{grid-template-columns:minmax(0,1fr)}}
+.concl{display:grid;gap:20px;max-width:780px;counter-reset:c;list-style:none;padding:0;margin:0}
+.concl li{padding-left:50px;position:relative;color:#C8D2EF}
+.concl li::before{counter-increment:c;content:counter(c);position:absolute;left:0;top:0;width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#04202B;font:700 .95rem/34px var(--font-mono);text-align:center;box-shadow:0 8px 22px -8px var(--accent)}
+.concl strong{font-family:var(--font-display);font-weight:600;font-size:1.15rem;display:block;margin-bottom:2px;color:var(--fg)}
+.refs{display:grid;gap:12px;margin:0;padding:0;list-style:none}
+.refs li{padding:15px 18px;border:1px solid rgba(150,170,255,.22);border-radius:14px;background:rgba(15,24,54,.74);display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap;transition:border-color .15s}
+.refs li:hover{border-color:var(--accent)}
+.refs .rt{min-width:0;flex:1 1 320px}
+.refs b{display:block;font-weight:600}
+.refs span{font-size:.9rem;color:var(--muted)}
+.books{margin-top:28px;padding:22px;display:grid;gap:8px}
+.books h3{margin-bottom:4px}
+.books p{margin:0;font-size:.95rem;color:var(--muted)}
+footer{margin-top:30px;border-top:1px solid rgba(150,170,255,.22);padding-block:32px 52px;color:var(--muted);font-size:.9rem;display:flex;gap:16px;justify-content:space-between;flex-wrap:wrap}
+
+@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+
+/* ===== v3 additions ===== */
+.t-tree{--c:#FFD84D;--c2:#FF9F43}
+#prog{position:fixed;left:0;top:0;height:4px;width:0;z-index:60;background:linear-gradient(90deg,var(--bus),var(--star),var(--ring),var(--mesh));box-shadow:0 0 12px rgba(94,224,255,.8);pointer-events:none}
+.dots-nav{position:fixed;right:max(10px,env(safe-area-inset-right,0px));top:50%;transform:translateY(-50%);z-index:25;display:flex;flex-direction:column;gap:11px;padding:12px 8px;border-radius:999px;background:rgba(10,16,42,.6);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid rgba(150,170,255,.18)}
+.dots-nav a{position:relative;width:11px;height:11px;border-radius:50%;background:rgba(150,170,255,.35);transition:transform .2s,background .2s,box-shadow .2s;display:block}
+.dots-nav a:hover{transform:scale(1.4);background:#fff}
+.dots-nav a.on{background:var(--accent);box-shadow:0 0 10px var(--accent);transform:scale(1.35)}
+.dots-nav a::after{content:attr(data-t);position:absolute;right:22px;top:50%;transform:translateY(-50%);white-space:nowrap;font:500 .76rem var(--font-body);padding:4px 10px;border-radius:8px;background:rgba(10,16,42,.95);border:1px solid rgba(150,170,255,.3);color:#fff;opacity:0;pointer-events:none;transition:opacity .15s}
+.dots-nav a:hover::after{opacity:1}
+@media(max-width:1280px){.dots-nav{display:none}}
+.bar nav a{padding:7px 10px;font-size:.88rem}
+.tbtn.on{background:rgba(94,224,255,.18);border-color:var(--accent)}
+.hero .chips .chip{flex:none}
+
+/* presentation HUD */
+#hud{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:50;display:none;align-items:center;gap:14px;padding:10px 12px 10px 18px;border-radius:999px;background:rgba(10,16,42,.9);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(94,224,255,.5);box-shadow:0 20px 50px -20px rgba(94,224,255,.7);font:500 .88rem var(--font-body);color:#fff;max-width:calc(100vw - 32px)}
+body.pres #hud{display:flex}
+#hud b{font:600 .85rem var(--font-mono);color:var(--accent)}
+#hud .ht2{max-width:30ch;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#hud button{width:34px;height:34px;border-radius:50%;border:1px solid rgba(160,180,255,.35);background:rgba(255,255,255,.08);color:#fff;font-size:1.05rem;cursor:pointer}
+#hud button:hover{background:rgba(94,224,255,.25)}
+#hud .hint{color:var(--muted);font-size:.78rem}
+@media(max-width:700px){#hud .hint{display:none}}
+
+/* intro */
+.objs{display:grid;gap:10px;margin:0;padding:0;list-style:none}
+.objs li{padding:14px 18px;border-radius:14px;background:rgba(15,24,54,.74);border:1px solid rgba(150,170,255,.2);border-left:4px solid var(--accent)}
+.objs li:nth-child(2){border-left-color:var(--bus)}.objs li:nth-child(3){border-left-color:var(--star)}.objs li:nth-child(4){border-left-color:var(--ring)}.objs li:nth-child(5){border-left-color:var(--mesh)}
+.objs b{display:block;font:500 .72rem var(--font-mono);text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-bottom:3px}
+.objs span{font-size:.95rem;color:#D4DDF5}
+
+/* gear */
+.gear{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+@media(max-width:960px){.gear{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}}
+@media(max-width:560px){.gear{grid-template-columns:minmax(0,1fr)}}
+.gcard{padding:18px;border-radius:20px;background:linear-gradient(165deg,color-mix(in srgb,var(--c) 26%,var(--surface)),var(--surface) 70%);border:1px solid color-mix(in srgb,var(--c) 45%,transparent);transition:box-shadow .25s,border-color .25s}
+.gcard:hover{box-shadow:0 24px 50px -24px var(--c);border-color:var(--c)}
+.gcard svg{width:100%;height:auto;display:block;border-radius:14px;background:radial-gradient(circle at 1px 1px,rgba(150,170,255,.18) 1px,transparent 1.3px) 0 0/16px 16px,rgba(7,11,26,.5);margin-bottom:14px}
+.gcard h3{color:var(--c);margin-bottom:6px;font-size:1.05rem}
+.gcard p{margin:0;font-size:.93rem;color:#C5D0EE}
+.tilt{transform:perspective(900px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));transition:transform .18s ease-out,box-shadow .25s,border-color .25s;will-change:transform}
+
+/* glossary tooltips */
+abbr.gl{text-decoration:underline dotted var(--accent);text-underline-offset:3px;cursor:help;position:relative;color:inherit}
+abbr.gl::after{content:attr(data-d);position:absolute;left:50%;bottom:calc(100% + 8px);transform:translateX(-50%) translateY(4px);width:max-content;max-width:min(300px,70vw);padding:10px 13px;border-radius:12px;background:#0B1230;border:1px solid var(--accent);color:#fff;font:400 .85rem/1.4 var(--font-body);opacity:0;pointer-events:none;transition:opacity .15s,transform .15s;z-index:40;box-shadow:0 14px 34px -12px rgba(94,224,255,.6)}
+abbr.gl:hover::after,abbr.gl:focus::after{opacity:1;transform:translateX(-50%)}
+
+/* demo (paso a paso) */
+.demo{display:grid;gap:8px;padding:10px 12px 4px}
+.demo-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.demo .dstep{font:500 .76rem var(--font-mono);color:var(--c);letter-spacing:.06em}
+.dtext{margin:0;min-height:3.1em;font-size:.93rem;line-height:1.45;color:#DCE5FF}
+.dprog{display:flex;gap:5px}.dprog i{flex:1;height:4px;border-radius:3px;background:rgba(150,170,255,.2);transition:background .3s}.dprog i.on{background:linear-gradient(90deg,var(--c),var(--c2))}
+.mac{font:500 .78rem var(--font-mono);border:1px solid color-mix(in srgb,var(--c) 40%,transparent);border-radius:10px;padding:8px 10px;background:rgba(7,11,26,.6);color:#CFE9FF}
+.mac b{color:var(--c)}
+.mac div{display:flex;justify-content:space-between;gap:12px}
+.dg .nd.hl,.dg .nd.rx{stroke:#fff;fill:color-mix(in srgb,var(--c) 40%,var(--surface-2))}
+.dg .dim{opacity:.28}
+.dg .nd.bad,.dg .hubr.bad{stroke:var(--bad);fill:#3A1530}
+.dg .hubr.bad{fill:var(--bad)}
+.dg .lk.bad{stroke:var(--bad);stroke-dasharray:3 7}
+.dg .lk.hot{stroke:var(--c);filter:drop-shadow(0 0 6px var(--c))}
+.dg .flash{animation:flash .5s ease 3}
+@keyframes flash{50%{filter:drop-shadow(0 0 16px #fff)}}
+.dg .dpk{fill:#fff;stroke:var(--c);stroke-width:2;filter:drop-shadow(0 0 8px #fff)}
+.dg .dpk.tok{fill:#FFD84D;stroke:#fff}
+.dg .dpk.red{fill:var(--bad);stroke:#fff}
+.dg .boom{font:700 22px var(--font-display);fill:var(--bad);text-anchor:middle;filter:drop-shadow(0 0 8px var(--bad))}
+
+/* lab */
+#laboratorio{border-radius:30px;padding:clamp(24px,4vw,52px);margin-block:30px;
+  background:radial-gradient(800px 420px at 0% 0%,rgba(255,216,77,.16),transparent 60%),radial-gradient(700px 420px at 100% 100%,rgba(91,147,255,.22),transparent 60%),linear-gradient(135deg,#0D1640,#12113A);
+  border:1px solid rgba(160,180,255,.26)}
+.lab-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px}
+.lab-grid .wide{grid-column:1/-1}
+@media(max-width:900px){.lab-grid{grid-template-columns:minmax(0,1fr)}}
+.lab{padding:22px;display:grid;gap:14px;align-content:start}
+.lab h3{font-size:1.2rem}.lab .sub{color:var(--muted);font-size:.9rem;margin:-6px 0 0}
+.lab .seg button{padding:7px 12px;font-size:.84rem}
+.ab-row{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:12px;align-items:center;padding:8px 0;border-top:1px solid rgba(150,170,255,.14);font-size:.88rem}
+.ab-row .l{text-align:center;color:var(--muted)}
+.ab-row .dots{white-space:nowrap}.ab-row .dots.r{text-align:right}
+.ab-sum{display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:.86rem}
+.ab-sum div{padding:10px 12px;border-radius:12px;background:rgba(7,11,26,.5);border:1px solid color-mix(in srgb,var(--c) 40%,transparent)}
+.ab-sum b{display:block;color:var(--c);font:500 .7rem var(--font-mono);text-transform:uppercase;letter-spacing:.08em}
+.field{display:grid;grid-template-columns:minmax(0,1fr) 120px;gap:10px;align-items:center;font-size:.9rem;color:var(--muted)}
+.field input[type=number]{width:100%;padding:8px 10px;border-radius:9px;border:1px solid rgba(160,180,255,.3);background:rgba(7,11,26,.6);color:#fff;font:500 .9rem var(--font-mono)}
+.field input[type=range]{grid-column:1/-1;width:100%;accent-color:var(--accent)}
+.cost-row{display:grid;grid-template-columns:90px minmax(0,1fr) 120px;gap:10px;align-items:center;font-size:.86rem}
+.cost-row .nm{color:var(--c);font-weight:600}
+.cost-row .v{font:500 .82rem var(--font-mono);text-align:right}
+.cost-row .bar-t{height:10px}
+.cost-note{font-size:.8rem;color:var(--muted);margin:0}
+.rel-row{display:grid;grid-template-columns:130px minmax(0,1fr) 84px;gap:12px;align-items:center;font-size:.88rem}
+.rel-row .v{font:600 .86rem var(--font-mono);text-align:right}
+.rel-row small{display:block;color:var(--muted);font-size:.74rem}
+.rel-head{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;align-items:baseline}
+.rel-head b{font:700 1.6rem var(--font-display);color:var(--accent)}
+
+/* timeline */
+.tl{position:relative;display:grid;gap:22px;padding-left:34px}
+.tl::before{content:"";position:absolute;left:11px;top:6px;bottom:6px;width:3px;border-radius:3px;background:linear-gradient(180deg,var(--bus),var(--star),var(--ring),var(--mesh))}
+.tl-item{position:relative;padding:18px 22px;border-radius:18px;background:linear-gradient(160deg,color-mix(in srgb,var(--c) 22%,var(--surface)),var(--surface) 70%);border:1px solid color-mix(in srgb,var(--c) 40%,transparent);max-width:760px;transition:box-shadow .25s}
+.tl-item:hover{box-shadow:0 18px 44px -22px var(--c)}
+.tl-item::before{content:"";position:absolute;left:-30px;top:24px;width:15px;height:15px;border-radius:50%;background:var(--c);box-shadow:0 0 14px var(--c);border:3px solid var(--bg)}
+.tl-item .yr{font:700 1.5rem var(--font-display);background:linear-gradient(95deg,var(--c),var(--c2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.tl-item h3{margin:2px 0 6px;font-size:1.08rem}.tl-item p{margin:0;font-size:.94rem;color:#C9D4F0}
+
+/* learn */
+.learn{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px}
+@media(max-width:900px){.learn{grid-template-columns:minmax(0,1fr)}}
+.qcard{padding:24px;display:grid;gap:14px;align-content:start}
+.qcard h3{font-size:1.2rem}
+.qn{font:500 .76rem var(--font-mono);color:var(--accent);letter-spacing:.08em}
+.opts{display:grid;gap:9px}
+.opts button{text-align:left;padding:12px 15px;border-radius:12px;border:1px solid rgba(160,180,255,.28);background:rgba(255,255,255,.05);color:var(--fg);font:500 .95rem var(--font-body);cursor:pointer;transition:background .15s,border-color .15s,transform .15s}
+.opts button:hover:not([disabled]){background:rgba(94,224,255,.14);border-color:var(--accent);transform:translateX(3px)}
+.opts button.ok{background:color-mix(in srgb,var(--good) 24%,var(--surface-2));border-color:var(--good)}
+.opts button.no{background:color-mix(in srgb,var(--bad) 24%,var(--surface-2));border-color:var(--bad)}
+.expl{margin:0;font-size:.92rem;padding:11px 14px;border-radius:12px;background:rgba(7,11,26,.5);border:1px solid rgba(150,170,255,.16)}
+.big{font:700 2.6rem/1 var(--font-display);background:linear-gradient(95deg,var(--accent),var(--accent-2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.rec-res{display:grid;gap:12px}
+.rec-res .win{padding:16px;border-radius:16px;background:linear-gradient(150deg,color-mix(in srgb,var(--c) 34%,var(--surface)),var(--surface));border:1px solid var(--c)}
+.rec-res .win h4{margin:0 0 4px;font:500 .72rem var(--font-mono);text-transform:uppercase;letter-spacing:.1em;color:var(--c)}
+.rec-res .win strong{font:700 1.7rem var(--font-display);display:block;color:#fff}
+.rec-res .win p{margin:8px 0 0;font-size:.93rem}
+.sc-row{display:grid;grid-template-columns:80px minmax(0,1fr) 38px;gap:10px;align-items:center;font-size:.84rem;color:var(--muted)}
+.sc-row span:last-child{font:500 .8rem var(--font-mono);color:#fff;text-align:right}
+
+/* glossary page */
+#glosario input[type=search]{width:100%;max-width:440px;padding:12px 16px;border-radius:12px;border:1px solid rgba(160,180,255,.32);background:rgba(7,11,26,.6);color:#fff;font:500 1rem var(--font-body);margin-bottom:20px}
+.gl-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media(max-width:760px){.gl-list{grid-template-columns:minmax(0,1fr)}}
+.gl-list div{padding:14px 18px;border-radius:14px;background:rgba(15,24,54,.74);border:1px solid rgba(150,170,255,.2)}
+.gl-list dt{font:600 1rem var(--font-display);color:var(--accent);margin-bottom:3px}
+.gl-list dd{margin:0;font-size:.92rem;color:#CBD6F2}
+
+/* hover polish + scroll reveal */
+.chapter .card.diagram:hover{box-shadow:0 36px 80px -30px var(--c)}
+.chip,.btn,.card{will-change:auto}
+@supports (animation-timeline:view()){
+  @keyframes rise{from{opacity:0;transform:translateY(34px) scale(.98)}to{opacity:1;transform:none}}
+  .rv{animation:rise linear both;animation-timeline:view();animation-range:entry 0% entry 42%}
+}
+@media(prefers-reduced-motion:reduce){.rv{animation:none!important}.tilt{transform:none!important}}
+body.pres .dots-nav{display:none}
+
+
+.byline{display:flex;align-items:center;gap:12px;font:500 .9rem var(--font-body);color:#D3DCF7}
+.byline img,.clogo{background:#fff;border-radius:12px;padding:3px;display:block;object-fit:contain}
+.byline img{width:48px;height:48px}
+.byline b{font-weight:600;color:#fff}
+#creditos{padding-top:20px}
+.cred{display:grid;grid-template-columns:auto minmax(0,1fr);gap:26px;align-items:center;padding:clamp(22px,3.5vw,40px);border-radius:26px;background:radial-gradient(700px 320px at 0% 0%,rgba(94,224,255,.16),transparent 60%),linear-gradient(160deg,var(--surface),var(--bg-2))}
+.clogo{width:150px;height:150px;border-radius:20px}
+.cred h2{margin:6px 0 14px}
+.cgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 28px;margin:0}
+.cgrid div{padding:10px 0;border-top:1px solid rgba(150,170,255,.18)}
+.cgrid dt{font:500 .72rem var(--font-mono);text-transform:uppercase;letter-spacing:.1em;color:var(--accent)}
+.cgrid dd{margin:2px 0 0;font-weight:500}
+@media(max-width:720px){.cred{grid-template-columns:minmax(0,1fr)}.cgrid{grid-template-columns:minmax(0,1fr)}.clogo{width:110px;height:110px}}
+</style>
+
+</head>
+<body>
+<div id="prog" aria-hidden="true"></div>
+<nav class="dots-nav" id="dotsNav" data-ia="aDots"></nav>
+<header class="bar">
+  <a class="brand" href="#inicio"><svg width="30" height="30" viewBox="0 0 28 28" aria-hidden="true"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5EE0FF"/><stop offset="1" stop-color="#B38BFF"/></linearGradient></defs><path d="M6 8 L22 6 L14 22 Z" fill="none" stroke="url(#lg)" stroke-width="2" stroke-linejoin="round"/><circle cx="6" cy="8" r="3.2" fill="url(#lg)"/><circle cx="22" cy="6" r="3.2" fill="url(#lg)"/><circle cx="14" cy="22" r="3.2" fill="url(#lg)"/></svg><span data-i="brand"></span></a>
+  <nav>
+    <a href="#fundamentos" data-i="nFund"></a><a href="#topologias" data-i="nTopo"></a><a href="#simulador" data-i="nSim"></a><a href="#laboratorio" data-i="nLab"></a><a href="#comparativa" data-i="nCmp"></a><a href="#historia" data-i="nHist"></a><a href="#aprende" data-i="nLearn"></a><a href="#fuentes" data-i="nSrc"></a>
+  </nav>
+  <div class="tools">
+    <button class="tbtn" id="presBtn" type="button" data-i="presBtn"></button>
+    <button class="tbtn" id="sndBtn" type="button" data-ia="aSnd" aria-pressed="false">♪ OFF</button>
+    <button class="tbtn" id="langBtn" type="button" data-ia="aLang">ES | EN</button>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="hero" id="inicio">
+    <canvas id="heroCanvas" aria-hidden="true"></canvas>
+    <div class="hero-in">
+      <div class="byline"><img src="data:image/png;base64,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" alt="Logo CUN" width="48" height="48"><span data-i="byline"></span></div>
+      <span class="label" data-i="eyebrow"></span>
+      <h1 data-i="h1"></h1>
+      <p class="lead" data-i="lead"></p>
+      <div class="row">
+        <a class="btn primary" href="#topologias" data-i="ctaExplore"></a>
+        <a class="btn" href="#simulador" data-i="ctaSim"></a>
+        <a class="btn" href="#fuentes" data-i="ctaSrc"></a>
+      </div>
+      <div class="chips">
+        <a class="chip t-bus" href="#bus"><i></i><span data-i="tBus"></span></a>
+        <a class="chip t-star" href="#star"><i></i><span data-i="tStar"></span></a>
+        <a class="chip t-ring" href="#ring"><i></i><span data-i="tRing"></span></a>
+        <a class="chip t-mesh" href="#mesh"><i></i><span data-i="tMesh"></span></a>
+        <a class="chip t-tree" href="#tree"><i></i><span data-i="tTree"></span></a>
+      </div>
+    </div>
+  </div>
+
+  <section id="intro">
+    <div class="two">
+      <div>
+        <div class="sec-head"><span class="label" data-i="nIntro"></span><h2 data-i="introTitle"></h2></div>
+        <p data-i="introP1"></p>
+        <p data-i="introP2"></p>
+      </div>
+      <ul class="objs" id="objList"></ul>
+    </div>
+  </section>
+
+  <section id="fundamentos">
+    <div class="two">
+      <div>
+        <div class="sec-head"><span class="label" data-i="nFund"></span><h2 data-i="fTitle"></h2></div>
+        <p data-i="fP1"></p>
+        <p data-i="fP2"></p>
+      </div>
+      <div class="tbl-scroll">
+        <table>
+          <thead><tr><th data-i="fTh1"></th><th data-i="fTh2"></th><th data-i="fTh3"></th></tr></thead>
+          <tbody id="fRows"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="crit" id="crit"></div>
+  </section>
+
+  <section id="medios">
+    <div class="sec-head"><span class="label" data-i="nMedia"></span><h2 data-i="mediaTitle"></h2><p data-i="mediaIntro"></p></div>
+    <div class="gear" id="gearGrid"></div>
+  </section>
+
+  <div id="topologias"><div id="chapters"></div></div>
+
+  <section id="simulador">
+    <div class="sec-head">
+      <span class="label" data-i="nSim"></span>
+      <h2 data-i="simTitle"></h2>
+      <p data-i="simIntro"></p>
+    </div>
+    <div class="sim">
+      <div>
+        <div class="card sim-card" id="simCard">
+          <svg id="simSvg" class="simsvg" viewBox="0 0 600 400" role="group" data-ia="aSim"></svg>
+        </div>
+        <p class="hintline" data-i="simHint"></p>
+      </div>
+      <div class="card ctl" id="ctl">
+        <div>
+          <div class="label" style="margin-bottom:8px" data-i="simTopo"></div>
+          <div class="seg" id="simTabs">
+            <button type="button" data-sim="bus" data-i="tBus"></button>
+            <button type="button" data-sim="star" data-i="tStar"></button>
+            <button type="button" data-sim="ring" data-i="tRing"></button>
+            <button type="button" data-sim="mesh" data-i="tMesh"></button>
+            <button type="button" data-sim="tree" data-i="tTree"></button>
+          </div>
+        </div>
+        <div id="modeWrap">
+          <div class="label" style="margin-bottom:8px" data-i="simVariant"></div>
+          <div class="seg modes" id="modeRow"></div>
+        </div>
+        <div class="state" id="stateBox" data-s="ok"><i></i><span id="stateTxt"></span></div>
+        <div class="metrics">
+          <div class="metric"><b id="mUp">6</b><span data-i="mUp"></span></div>
+          <div class="metric"><b id="mCuts">0</b><span data-i="mCuts"></span></div>
+          <div class="metric"><b id="mOff">0</b><span data-i="mOff"></span></div>
+          <div class="metric"><b id="mLinks">0</b><span data-i="mLinks"></span></div>
+        </div>
+        <p class="rule" id="ruleTxt"></p>
+        <div class="row">
+          <button class="btn primary small" id="bSend" type="button" data-i="bSend"></button>
+          <button class="btn small" id="bCut" type="button" data-i="bCut"></button>
+          <button class="btn small" id="bOff" type="button" data-i="bOff"></button>
+          <button class="btn small" id="bReset" type="button" data-i="bReset"></button>
+        </div>
+        <p class="log" id="logTxt" aria-live="polite"></p>
+      </div>
+    </div>
+  </section>
+
+  <section id="laboratorio">
+    <div class="sec-head"><span class="label" data-i="nLab"></span><h2 data-i="labTitle"></h2><p data-i="labIntro"></p></div>
+    <div class="lab-grid">
+      <div class="card lab rv"><h3 data-i="abTitle"></h3><p class="sub" data-i="abSub"></p><div id="abBody" style="display:grid;gap:12px"></div></div>
+      <div class="card lab rv"><h3 data-i="costTitle"></h3><div id="costBody" style="display:grid;gap:12px"></div></div>
+      <div class="card lab wide rv" id="relBody"></div>
+    </div>
+  </section>
+
+  <section id="comparativa">
+    <div class="sec-head">
+      <span class="label" data-i="nCmp"></span>
+      <h2 data-i="cmpTitle"></h2>
+      <p data-i="cmpIntro"></p>
+    </div>
+    <div class="tbl-scroll"><table class="cmp" id="cmpTbl"></table></div>
+    <p class="note" data-i="cmpNote"></p>
+
+    <div class="card calc">
+      <div class="calc-head">
+        <div><h3 data-i="calcTitle"></h3><span class="label" data-i="calcSub"></span></div>
+        <div><span class="label" data-i="calcN"></span> <b id="nVal">8</b></div>
+      </div>
+      <input type="range" id="nRange" min="3" max="30" value="8" data-ia="aRange">
+      <div id="calcRows"></div>
+    </div>
+  </section>
+
+  <section id="hibridas">
+    <div class="sec-head">
+      <span class="label" data-i="nHyb"></span>
+      <h2 data-i="hybTitle"></h2>
+      <p data-i="hybIntro"></p>
+    </div>
+    <div class="cards" id="hybCards"></div>
+  </section>
+
+  <section id="historia">
+    <div class="sec-head"><span class="label" data-i="nHist"></span><h2 data-i="histTitle"></h2><p data-i="histIntro"></p></div>
+    <div class="tl" id="tlList"></div>
+  </section>
+
+  <section id="aprende">
+    <div class="sec-head"><span class="label" data-i="nLearn"></span><h2 data-i="learnTitle"></h2><p data-i="learnIntro"></p></div>
+    <div class="learn">
+      <div class="card qcard rv" id="recBody"></div>
+      <div class="card qcard rv" id="quizBody"></div>
+    </div>
+  </section>
+
+  <section id="glosario">
+    <div class="sec-head"><span class="label" data-i="nGloss"></span><h2 data-i="glTitle"></h2></div>
+    <input type="search" id="glQ" autocomplete="off" aria-label="Buscar / Search">
+    <dl class="gl-list" id="glList"></dl>
+  </section>
+
+  <section id="conclusiones">
+    <div class="sec-head"><span class="label" data-i="conLabel"></span><h2 data-i="conTitle"></h2></div>
+    <ol class="concl" id="conList"></ol>
+  </section>
+
+  <section id="fuentes">
+    <div class="sec-head"><span class="label" data-i="nSrc"></span><h2 data-i="srcTitle"></h2><p data-i="srcIntro"></p></div>
+    <ul class="refs" id="refList"></ul>
+    <div class="card books">
+      <h3 data-i="bookTitle"></h3>
+      <p data-i="book1"></p><p data-i="book2"></p><p data-i="book3"></p>
+    </div>
+  </section>
+  <section id="creditos">
+    <div class="card cred">
+      <img class="clogo" src="data:image/png;base64,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" alt="Logo CUN">
+      <div>
+        <span class="label" data-i="credLabel"></span>
+        <h2 data-i="credTitle"></h2>
+        <dl class="cgrid" id="credList"></dl>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="wrap">
+  <span data-i="foot1"></span>
+  <span data-i="foot2"></span>
+</footer>
+
+<div id="hud" role="toolbar" aria-label="Exposición / Presentation"><button type="button" id="hudPrev" aria-label="‹">‹</button><b id="hudN"></b><span class="ht2" id="hudT"></span><button type="button" id="hudNext" aria-label="›">›</button><span class="hint" data-i="presHint"></span><button type="button" id="hudExit" aria-label="Esc">✕</button></div>
+
+<script>
+(function(){
+"use strict";
+var $=function(s,r){return (r||document).querySelector(s)};
+var $$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))};
+var TYPES=["bus","star","ring","mesh","tree"];
+
+/* ---------- language ---------- */
+var lang="es";
+try{var sv=localStorage.getItem("topo-lang");if(sv==="es"||sv==="en")lang=sv;else if(!String(navigator.language||"es").toLowerCase().startsWith("es"))lang="en"}catch(e){}
+
+var I={
+es:{
+ brand:"Topologías de red",nFund:"Fundamentos",nTopo:"Topologías",nSim:"Simulador",nCmp:"Comparativa",nHyb:"Híbridas",nSrc:"Fuentes",
+ aLang:"Cambiar idioma",aTheme:"Cambiar tema claro u oscuro",aSim:"Simulador de fallas de red",aRange:"Número de equipos",
+ eyebrow:"Redes de computadores · Capa física",h1:"Topologías de red físicas",
+ lead:"Bus, estrella, anillo, malla y árbol. Cómo se conectan los equipos de una red, por qué importa y qué pasa cuando algo falla.",
+ ctaExplore:"Explorar las topologías",ctaSim:"Probar el simulador",ctaSrc:"Ver fuentes",
+ tBus:"Bus",tStar:"Estrella",tRing:"Anillo",tMesh:"Malla",
+ fTitle:"Antes de empezar: física o lógica",
+ fP1:"La topología física describe cómo se disponen los cables y los equipos en el espacio. La topología lógica describe cómo viajan los datos por la red, sin importar cómo estén cableados.",
+ fP2:"Por eso una misma red puede tener una forma física y otra lógica. Esta página se centra en la física, que define cuánto cable hace falta y qué se rompe cuando algo falla. Las redes reales además mezclan topologías (híbridas).",
+ fTh1:"Tecnología",fTh2:"Física",fTh3:"Lógica",
+ fRows:[["Ethernet con hub","Estrella","Bus"],["Ethernet con switch","Estrella","Estrella"],["Token Ring (IEEE 802.5)","Estrella, con concentrador MAU","Anillo"],["FDDI","Anillo","Anillo"]],
+ crit:[["Costo","Cable, puertos y equipos activos que exige cada diseño."],["Tamaño","Cuántos equipos se conectan y a qué distancias."],["Confiabilidad","Qué ocurre cuando un cable o un equipo falla."],["Crecimiento","Qué tan fácil es sumar equipos más adelante."]],
+ how:"Cómo funciona",pros:"Ventajas",cons:"Desventajas",uses:"Dónde se usa",more:"Leer más",
+ sMedium:"Medio",sStd:"Estándar",sSpeed:"Velocidad",sReach:"Alcance",
+ simTitle:"Simulador de fallas",simIntro:"Rompe cables, apaga equipos y envía paquetes. Cada topología reacciona distinto, y esa diferencia es el motivo por el que se eligen unas sobre otras.",
+ simHint:"Haz clic en un equipo o en un cable para dañarlo. Un nuevo clic lo repara.",
+ simTopo:"Topología",simVariant:"Variante",
+ mUp:"equipos comunicados",mCuts:"cables cortados",mOff:"equipos apagados",mLinks:"cables en total",
+ bSend:"Enviar paquete",bCut:"Cortar un cable",bOff:"Apagar un equipo",bReset:"Restablecer",
+ mSingle:"Anillo simple",mDual:"Doble anillo (FDDI)",mFull:"Malla completa",mPartial:"Malla parcial",
+ stOk:"Red operativa",stTol:"Operativa con fallos",stDeg:function(n){return "Degradada: "+n+(n===1?" equipo aislado":" equipos aislados")},stDown:"Red caída",
+ rule:{bus:"En un bus, cualquier corte del cable troncal deja a los dos tramos sin terminador: la señal rebota y toda la red cae. Un equipo apagado no afecta a los demás, porque el cable es pasivo.",
+  star:"Un cable roto aísla a un solo equipo. Si falla el switch central, cae toda la red.",
+  ring_single:"En anillo simple el testigo debe recorrer todo el círculo. Cualquier equipo o cable caído lo detiene. (Modelo puro; los MAU reales podían puentear estaciones apagadas.)",
+  ring_dual:"Con doble anillo, un fallo se rodea reconfigurando los anillos. Dos fallos pueden partir la red en dos.",
+  mesh_full:"Cada par de equipos tiene su propio enlace y siempre hay rutas alternas. Hay que cortar muchos cables para aislar a alguien.",
+  mesh_partial:"Menos cables que la malla completa y aun así con rutas alternas. Es el diseño habitual en redes grandes."},
+ pc:"PC",sw:"SW",drop:function(p){return "derivación de "+p},bbName:"tramo del bus",
+ cutMsg:function(n){return "Cable cortado: "+n+"."},fixMsg:function(n){return "Cable reparado: "+n+"."},offMsg:function(n){return n+" apagado."},onMsg:function(n){return n+" encendido."},
+ resetMsg:"Red restablecida.",noneMsg:"Todos los cables ya están cortados.",noneOff:"No quedan equipos para apagar.",
+ need2:"Hacen falta al menos dos equipos encendidos para enviar un paquete.",
+ pktOk:function(s,d,p,h){return "Paquete de "+s+" a "+d+" entregado por "+p+" ("+h+(h===1?" enlace":" enlaces")+")."},
+ busNote:" Todos los equipos reciben la señal; solo el destino la procesa.",
+ noRoute:function(s,d){return "Sin ruta: "+s+" no puede llegar a "+d+" con las fallas actuales."},
+ cmpTitle:"Comparativa y costo del cableado",cmpIntro:"Una mirada rápida a qué gana y qué cede cada topología. Después, una calculadora muestra por qué la malla completa no escala.",
+ cmpNote:"Valoración cualitativa elaborada a partir de las fuentes de esta página. Más puntos es mejor en cada fila.",
+ cmpRows:{cost:"Bajo costo",scale:"Escalabilidad",fault:"Tolerancia a fallos",diag:"Facilidad de diagnóstico",load:"Rendimiento con carga",spof:"Punto único de falla",today:"Presencia hoy"},
+ spof:{bus:"El cable troncal",star:"El switch central",ring:"Cualquier enlace o equipo (anillo simple)",mesh:"Ninguno en malla completa"},
+ today:{bus:"Histórica en LAN; sigue en buses industriales",star:"Dominante en redes locales",ring:"Obsoleta en LAN; vigente en anillos de operadores",mesh:"Núcleo de Internet y redes inalámbricas mesh"},
+ cmpTop:"Criterio",
+ calcTitle:"Calculadora de cableado",calcSub:"¿Cuánto crece cada topología?",calcN:"Equipos:",
+ calcLinks:"Cables punto a punto",calcPorts:"Puertos por equipo",calcShared:"1 cable compartido",
+ hybTitle:"Híbridas y árbol: lo que realmente se construye",
+ hybIntro:"Las redes reales combinan topologías. La topología en árbol une estrellas mediante un enlace troncal. Una topología híbrida mezcla dos o más tipos, por ejemplo estrella-bus, estrella-anillo o árbol-malla.",
+ hyb:[["Campus universitario","Una estrella por edificio y un núcleo que las une. El núcleo suele usar malla parcial para tener rutas redundantes."],["Internet","Miles de redes interconectadas en malla parcial. Si un enlace cae, los protocolos de enrutamiento buscan otra ruta."],["Token Ring","Cableado físico en estrella hacia un concentrador MAU, con circulación lógica en anillo."],["Wi-Fi mesh","Varios nodos inalámbricos se retransmiten el tráfico entre sí, como una malla parcial sin cables."]],
+ conLabel:"Cierre",conTitle:"Conclusiones",
+ con:[["Elegir es negociar","Cada topología cambia costo por resistencia a fallos y facilidad de crecimiento. No existe una mejor en todo."],["La estrella ganó la LAN","Diagnosticar un puerto y aislar un cable roto pesa más que el punto único de falla del switch central."],["La malla paga por disponibilidad","Los cables y puertos crecen con el cuadrado de los equipos, así que se reserva a núcleos donde una caída es inaceptable."],["Bus y anillo explican la historia","Ya no son opción para una LAN nueva, pero siguen vivos en buses industriales y en anillos de telecomunicaciones."]],
+ srcTitle:"Fuentes y referencias",srcIntro:"Material consultado para esta página. Los enlaces se abren en una pestaña nueva.",
+ refs:[["Tipos de topología de red: bus, anillo, estrella, malla, árbol","Guru99. Descripción de siete topologías con ventajas y desventajas.","https://www.guru99.com/es/type-of-network-topology.html"],["Arquitectura de redes: topologías físicas","BUAP. Apuntes con cinco topologías básicas y topologías híbridas, incluidos Token Ring y FDDI.","https://ecosistema.buap.mx/forms/files/dspace-38/RC_U1_arquitectura_LINEA_3.pdf"],["Computer Network Topologies","Networkers Home. Aplicaciones reales de cada topología.","https://vs.networkershome.com/computer-network-topologies"],["What is network topology?","CloudMyLab. Topologías híbridas y laboratorios de emulación.","https://blog.cloudmylab.com/what-is-network-topology"],["Topología de bus","Lifeder. Ventajas y desventajas del bus.","https://www.lifeder.com/topologia-de-bus/"],["Topologías de red","StudySmarter. Estrella y bus con ejemplos de uso empresarial.","https://www.studysmarter.es/resumenes/ingenieria/ingenieria-electrica/topologias-de-red/"],["Videos explicativos sobre topologías","Búsqueda en YouTube con explicaciones animadas.","https://www.youtube.com/results?search_query=network+topologies+explained"]],
+ open:"Abrir",
+ bookTitle:"Libros y estándares para citar",
+ book1:"Tanenbaum, A. y Wetherall, D. Computer Networks. Pearson.",
+ book2:"Kurose, J. y Ross, K. Computer Networking: A Top-Down Approach. Pearson.",
+ book3:"IEEE 802.3 (Ethernet) e IEEE 802.5 (Token Ring).",
+ foot1:"Trabajo universitario · Ingeniería de Sistemas · 2026-2",foot2:"Hecho con HTML, CSS y JavaScript, sin dependencias externas."
+},
+en:{
+ brand:"Network topologies",nFund:"Basics",nTopo:"Topologies",nSim:"Simulator",nCmp:"Comparison",nHyb:"Hybrids",nSrc:"Sources",
+ aLang:"Switch language",aTheme:"Switch light or dark theme",aSim:"Network failure simulator",aRange:"Number of devices",
+ eyebrow:"Computer networks · Physical layer",h1:"Physical network topologies",
+ lead:"Bus, star, ring, mesh and tree. How the devices on a network are wired together, why it matters and what happens when something breaks.",
+ ctaExplore:"Explore the topologies",ctaSim:"Try the simulator",ctaSrc:"See sources",
+ tBus:"Bus",tStar:"Star",tRing:"Ring",tMesh:"Mesh",
+ fTitle:"Before we start: physical or logical",
+ fP1:"The physical topology describes how cables and devices are laid out in space. The logical topology describes how data travels across the network, however it is wired.",
+ fP2:"That is why one network can have a physical shape and a different logical one. This page focuses on the physical one, which sets how much cable you need and what breaks when something fails. Real networks also mix topologies (hybrids).",
+ fTh1:"Technology",fTh2:"Physical",fTh3:"Logical",
+ fRows:[["Ethernet with a hub","Star","Bus"],["Ethernet with a switch","Star","Star"],["Token Ring (IEEE 802.5)","Star, with an MAU concentrator","Ring"],["FDDI","Ring","Ring"]],
+ crit:[["Cost","Cable, ports and active equipment each design demands."],["Size","How many devices and over what distances."],["Reliability","What happens when a cable or device fails."],["Growth","How easy it is to add devices later."]],
+ how:"How it works",pros:"Advantages",cons:"Disadvantages",uses:"Where it is used",more:"Read more",
+ sMedium:"Medium",sStd:"Standard",sSpeed:"Speed",sReach:"Reach",
+ simTitle:"Failure simulator",simIntro:"Break cables, switch devices off and send packets. Each topology reacts differently, and that difference is why some are chosen over others.",
+ simHint:"Click a device or a cable to break it. Click again to repair it.",
+ simTopo:"Topology",simVariant:"Variant",
+ mUp:"devices communicating",mCuts:"cables cut",mOff:"devices off",mLinks:"cables in total",
+ bSend:"Send packet",bCut:"Cut a cable",bOff:"Switch off a device",bReset:"Reset",
+ mSingle:"Single ring",mDual:"Dual ring (FDDI)",mFull:"Full mesh",mPartial:"Partial mesh",
+ stOk:"Network up",stTol:"Up, with faults",stDeg:function(n){return "Degraded: "+n+(n===1?" device isolated":" devices isolated")},stDown:"Network down",
+ rule:{bus:"On a bus, any break in the backbone leaves both pieces without a terminator: the signal reflects and the whole network goes down. A switched-off device does not affect the rest, because the cable is passive.",
+  star:"A broken cable isolates a single device. If the central switch fails, the whole network goes down.",
+  ring_single:"On a single ring the token must travel the whole circle. Any failed device or cable stops it. (Pure model; real MAUs could bypass powered-off stations.)",
+  ring_dual:"With a dual ring, one fault is routed around by reconfiguring the rings. Two faults can split the network in two.",
+  mesh_full:"Every pair of devices has its own link and there are always alternative routes. Many cables must be cut to isolate anyone.",
+  mesh_partial:"Fewer cables than a full mesh and still with alternative routes. This is the usual design in large networks."},
+ pc:"PC",sw:"SW",drop:function(p){return "drop cable of "+p},bbName:"bus segment",
+ cutMsg:function(n){return "Cable cut: "+n+"."},fixMsg:function(n){return "Cable repaired: "+n+"."},offMsg:function(n){return n+" switched off."},onMsg:function(n){return n+" switched on."},
+ resetMsg:"Network reset.",noneMsg:"All cables are already cut.",noneOff:"No devices left to switch off.",
+ need2:"At least two powered devices are needed to send a packet.",
+ pktOk:function(s,d,p,h){return "Packet from "+s+" to "+d+" delivered via "+p+" ("+h+(h===1?" link":" links")+")."},
+ busNote:" Every device receives the signal; only the destination processes it.",
+ noRoute:function(s,d){return "No route: "+s+" cannot reach "+d+" with the current failures."},
+ cmpTitle:"Comparison and cabling cost",cmpIntro:"A quick look at what each topology wins and gives up. A calculator then shows why a full mesh does not scale.",
+ cmpNote:"Qualitative rating based on the sources on this page. More dots is better in every row.",
+ cmpRows:{cost:"Low cost",scale:"Scalability",fault:"Fault tolerance",diag:"Ease of troubleshooting",load:"Performance under load",spof:"Single point of failure",today:"Presence today"},
+ spof:{bus:"The backbone cable",star:"The central switch",ring:"Any link or device (single ring)",mesh:"None in a full mesh"},
+ today:{bus:"Historic in LANs; still found in industrial buses",star:"Dominant in local networks",ring:"Obsolete in LANs; alive in carrier rings",mesh:"Internet core and wireless mesh networks"},
+ cmpTop:"Criterion",
+ calcTitle:"Cabling calculator",calcSub:"How fast does each topology grow?",calcN:"Devices:",
+ calcLinks:"Point-to-point cables",calcPorts:"Ports per device",calcShared:"1 shared cable",
+ hybTitle:"Hybrids and tree: what actually gets built",
+ hybIntro:"Real networks combine topologies. A tree topology joins stars through a backbone link. A hybrid topology mixes two or more types, for example star-bus, star-ring or tree-mesh.",
+ hyb:[["University campus","One star per building and a core that joins them. The core often uses a partial mesh to keep redundant routes."],["The Internet","Thousands of networks interconnected in a partial mesh. If a link goes down, routing protocols look for another path."],["Token Ring","Physical star wiring to an MAU concentrator, with logical circulation in a ring."],["Wi-Fi mesh","Several wireless nodes relay traffic for each other, like a partial mesh without cables."]],
+ conLabel:"Wrap-up",conTitle:"Conclusions",
+ con:[["Choosing is trading","Each topology swaps cost for fault resistance and ease of growth. None is best at everything."],["Star won the LAN","Diagnosing a port and isolating a broken cable matter more than the central switch being a single point of failure."],["Mesh pays for availability","Cables and ports grow with the square of the devices, so it is kept for cores where an outage is unacceptable."],["Bus and ring explain the history","They are no longer an option for a new LAN, but they live on in industrial buses and telecom rings."]],
+ srcTitle:"Sources and references",srcIntro:"Material consulted for this page. Links open in a new tab.",
+ refs:[["Types of network topology: bus, ring, star, mesh, tree","Guru99. Seven topologies with advantages and disadvantages.","https://www.guru99.com/es/type-of-network-topology.html"],["Network architecture: physical topologies","BUAP. Lecture notes with five basic topologies and hybrids, including Token Ring and FDDI.","https://ecosistema.buap.mx/forms/files/dspace-38/RC_U1_arquitectura_LINEA_3.pdf"],["Computer Network Topologies","Networkers Home. Real applications of each topology.","https://vs.networkershome.com/computer-network-topologies"],["What is network topology?","CloudMyLab. Hybrid topologies and emulation labs.","https://blog.cloudmylab.com/what-is-network-topology"],["Bus network","Wikipedia. Overview of the bus topology.","https://en.wikipedia.org/wiki/Bus_network"],["Mesh networking","Wikipedia. Overview of full and partial meshes.","https://en.wikipedia.org/wiki/Mesh_networking"],["Explainer videos on topologies","YouTube search with animated explanations.","https://www.youtube.com/results?search_query=network+topologies+explained"]],
+ open:"Open",
+ bookTitle:"Books and standards to cite",
+ book1:"Tanenbaum, A. and Wetherall, D. Computer Networks. Pearson.",
+ book2:"Kurose, J. and Ross, K. Computer Networking: A Top-Down Approach. Pearson.",
+ book3:"IEEE 802.3 (Ethernet) and IEEE 802.5 (Token Ring).",
+ foot1:"University project · Systems Engineering · 2026-2",foot2:"Built with HTML, CSS and JavaScript, no external dependencies."
+}};
+
+var TP={
+bus:{
+ es:{name:"Topología de bus",tag:"Un solo cable para todos",
+  def:"Todos los equipos se conectan a un único cable troncal compartido, el bus. Cada extremo termina en un terminador de 50 Ω que absorbe la señal para que no rebote y choque consigo misma.",
+  how:"Cuando un equipo transmite, la señal viaja por el cable en las dos direcciones y todos la reciben; solo el destinatario correcto la procesa. Como el medio es compartido, dos transmisiones simultáneas chocan. Por eso el Ethernet clásico usó CSMA/CD: escuchar antes de hablar y reintentar tras una colisión.",
+  pros:["Poco cable y bajo costo de instalación","Sencillo de montar en redes pequeñas o temporales","Conectar o retirar un equipo normalmente no afecta a los demás"],
+  cons:["Un corte o un terminador ausente deja sin servicio a todo el segmento","El rendimiento cae al sumar equipos: comparten el mismo ancho de banda y chocan","Diagnóstico lento: hay que revisar el cable tramo a tramo","La longitud máxima la limita la atenuación de la señal"],
+  uses:["Ethernet original 10BASE5 y 10BASE2 sobre cable coaxial, en los años 80 y 90","Hoy sobrevive en buses industriales y de vehículos: CAN en automóviles, Modbus sobre RS-485"],
+  sheet:["Cable coaxial (10BASE5, 10BASE2) o par trenzado en RS-485","IEEE 802.3 (Ethernet original)","10 Mb/s","185 m (10BASE2) y 500 m (10BASE5) por segmento"],
+  link:"https://www.lifeder.com/topologia-de-bus/"},
+ en:{name:"Bus topology",tag:"One cable for everyone",
+  def:"Every device connects to a single shared backbone cable, the bus. Each end finishes in a 50 Ω terminator that absorbs the signal so it does not bounce back and collide with itself.",
+  how:"When a device transmits, the signal travels along the cable in both directions and everyone receives it; only the right recipient processes it. Because the medium is shared, two simultaneous transmissions collide. That is why classic Ethernet used CSMA/CD: listen before talking and retry after a collision.",
+  pros:["Little cable and low installation cost","Simple to set up in small or temporary networks","Connecting or removing a device normally does not affect the others"],
+  cons:["A break or a missing terminator takes down the whole segment","Performance drops as devices are added: they share bandwidth and collide","Slow troubleshooting: the cable must be checked section by section","Maximum length is limited by signal attenuation"],
+  uses:["Original Ethernet 10BASE5 and 10BASE2 over coaxial cable, in the 80s and 90s","Today it survives in industrial and vehicle buses: CAN in cars, Modbus over RS-485"],
+  sheet:["Coaxial cable (10BASE5, 10BASE2) or twisted pair in RS-485","IEEE 802.3 (original Ethernet)","10 Mb/s","185 m (10BASE2) and 500 m (10BASE5) per segment"],
+  link:"https://en.wikipedia.org/wiki/Bus_network"}},
+star:{
+ es:{name:"Topología en estrella",tag:"Todo pasa por el centro",
+  def:"Cada equipo tiene su propio cable hasta un dispositivo central, un switch o, antiguamente, un hub. Es la topología física de casi todas las redes locales actuales.",
+  how:"El switch aprende en qué puerto está cada equipo y reenvía cada trama solo al puerto de destino, así que cada equipo tiene un enlace dedicado y no compite por el cable. Con un hub, en cambio, la señal se repetía en todos los puertos y la red se comportaba como un bus.",
+  pros:["Un equipo o cable que falla aísla solo a ese equipo","Fácil agregar equipos y diagnosticar: basta mirar el puerto","Administración centralizada y posibilidad de priorizar tráfico","Enlaces dedicados: mejor rendimiento que un medio compartido"],
+  cons:["Si el nodo central falla, toda la red se cae","Más cableado que bus o anillo: un cable por equipo","El rendimiento depende de la capacidad del switch","Mayor costo inicial por switches y cableado"],
+  uses:["LAN de oficinas, universidades y hogares con Ethernet de par trenzado (10BASE-T, 100BASE-TX, 1000BASE-T)","Wi-Fi en modo infraestructura: el punto de acceso es el centro"],
+  sheet:["Par trenzado UTP (Cat 5e o 6) o fibra óptica","IEEE 802.3 (10BASE-T y posteriores)","De 10 Mb/s a 10 Gb/s y más","100 m por enlace en par trenzado"],
+  link:"https://www.studysmarter.es/resumenes/ingenieria/ingenieria-electrica/topologias-de-red/"},
+ en:{name:"Star topology",tag:"Everything goes through the center",
+  def:"Each device has its own cable to a central device, a switch or, in the past, a hub. It is the physical topology of almost every local network today.",
+  how:"The switch learns which port each device is on and forwards each frame only to the destination port, so every device has a dedicated link and does not compete for the cable. With a hub, the signal was repeated on every port and the network behaved like a bus.",
+  pros:["A failed device or cable isolates only that device","Easy to add devices and to troubleshoot: just look at the port","Centralized management and the option to prioritize traffic","Dedicated links: better performance than a shared medium"],
+  cons:["If the central node fails, the whole network goes down","More cabling than bus or ring: one cable per device","Performance depends on the switch capacity","Higher upfront cost for switches and cabling"],
+  uses:["Office, university and home LANs with twisted-pair Ethernet (10BASE-T, 100BASE-TX, 1000BASE-T)","Wi-Fi in infrastructure mode: the access point is the center"],
+  sheet:["UTP twisted pair (Cat 5e or 6) or optical fiber","IEEE 802.3 (10BASE-T and later)","From 10 Mb/s to 10 Gb/s and beyond","100 m per twisted-pair link"],
+  link:"https://en.wikipedia.org/wiki/Star_network"}},
+ring:{
+ es:{name:"Topología en anillo",tag:"Cada equipo pasa el mensaje al siguiente",
+  def:"Cada equipo se conecta con exactamente dos vecinos y el conjunto forma un círculo cerrado. Los datos circulan en una dirección, de equipo en equipo, hasta llegar al destino.",
+  how:"En Token Ring (IEEE 802.5) circula un testigo: solo el equipo que lo tiene puede transmitir, así que no hay colisiones y el acceso es equitativo y predecible. Para tolerar fallos, FDDI usa dos anillos de fibra que giran en sentidos opuestos y se reconfiguran si un enlace se corta.",
+  pros:["Sin colisiones: el paso de testigo ordena el tráfico","Acceso equitativo: ningún equipo acapara la red","Rendimiento predecible cuando aumenta la carga","Con doble anillo, resiste el corte de un enlace"],
+  cons:["En anillo simple, la falla de un equipo o cable puede detener toda la red","Agregar o quitar equipos interrumpe el anillo","Cada equipo necesita dos conexiones y los datos cruzan a los intermedios","Tecnología prácticamente obsoleta en redes locales"],
+  uses:["Token Ring de IBM en redes corporativas, a 4 y 16 Mb/s","FDDI en backbones de campus, a 100 Mb/s sobre fibra","Anillos SONET/SDH en redes de operadores de telecomunicaciones"],
+  sheet:["Par trenzado o fibra óptica","IEEE 802.5 (Token Ring) y ANSI X3T9.5 (FDDI)","4 y 16 Mb/s (Token Ring), 100 Mb/s (FDDI)","Limitado por el número de estaciones y el medio"],
+  link:"https://www.guru99.com/es/type-of-network-topology.html"},
+ en:{name:"Ring topology",tag:"Each device passes the message on",
+  def:"Each device connects to exactly two neighbors and together they form a closed circle. Data travels in one direction, from device to device, until it reaches its destination.",
+  how:"In Token Ring (IEEE 802.5) a token circulates: only the device holding it may transmit, so there are no collisions and access is fair and predictable. To tolerate faults, FDDI uses two fiber rings turning in opposite directions that reconfigure if a link is cut.",
+  pros:["No collisions: token passing orders the traffic","Fair access: no device hogs the network","Predictable performance as load grows","With a dual ring, it survives a cut link"],
+  cons:["On a single ring, one failed device or cable can stop the whole network","Adding or removing devices interrupts the ring","Each device needs two connections and data crosses the intermediate ones","Practically obsolete in local networks"],
+  uses:["IBM Token Ring in corporate networks, at 4 and 16 Mb/s","FDDI in campus backbones, at 100 Mb/s over fiber","SONET/SDH rings in telecom carrier networks"],
+  sheet:["Twisted pair or optical fiber","IEEE 802.5 (Token Ring) and ANSI X3T9.5 (FDDI)","4 and 16 Mb/s (Token Ring), 100 Mb/s (FDDI)","Limited by the number of stations and the medium"],
+  link:"https://en.wikipedia.org/wiki/Token_ring"}},
+mesh:{
+ es:{name:"Topología en malla",tag:"Muchos caminos para llegar",
+  def:"Los equipos se interconectan con enlaces punto a punto. En malla completa cada equipo se une directamente con todos los demás. En malla parcial, solo algunos tienen enlaces múltiples.",
+  how:"Si un enlace o un nodo falla, el tráfico toma otra ruta. Con n equipos, la malla completa necesita n(n−1)/2 enlaces y n−1 puertos por equipo. Por eso se reserva para núcleos críticos y se usa malla parcial en el resto.",
+  pros:["Máxima redundancia: varios caminos entre cada par de nodos","La falla de un enlace casi nunca interrumpe la comunicación","Conexiones independientes: más seguridad y aislamiento del tráfico","Cada enlace se puede probar por separado"],
+  cons:["Costo muy alto: cables y puertos crecen con el cuadrado de los equipos","Instalación y mantenimiento complejos","Gestión de rutas más compleja","Poco práctica en malla completa para redes grandes"],
+  uses:["Núcleo de Internet: routers unidos en malla parcial con rutas múltiples","Redes WAN y backbones de proveedores","Redes inalámbricas mesh, como IEEE 802.11s y el Wi-Fi mesh doméstico"],
+  sheet:["Fibra óptica, par trenzado o radio","Ethernet punto a punto y protocolos de enrutamiento (OSPF, BGP)","Según cada enlace","Según el medio de cada enlace"],
+  link:"https://ecosistema.buap.mx/forms/files/dspace-38/RC_U1_arquitectura_LINEA_3.pdf"},
+ en:{name:"Mesh topology",tag:"Many ways to get there",
+  def:"Devices are interconnected with point-to-point links. In a full mesh every device connects directly to all the others. In a partial mesh, only some have multiple links.",
+  how:"If a link or a node fails, traffic takes another route. With n devices, a full mesh needs n(n−1)/2 links and n−1 ports per device. That is why it is kept for critical cores and a partial mesh is used elsewhere.",
+  pros:["Maximum redundancy: several paths between every pair of nodes","A link failure almost never interrupts communication","Independent connections: more security and traffic isolation","Each link can be tested separately"],
+  cons:["Very high cost: cables and ports grow with the square of the devices","Complex installation and maintenance","More complex route management","Impractical as a full mesh for large networks"],
+  uses:["Internet core: routers joined in a partial mesh with multiple routes","WAN and provider backbones","Wireless mesh networks, such as IEEE 802.11s and home Wi-Fi mesh"],
+  sheet:["Optical fiber, twisted pair or radio","Point-to-point Ethernet and routing protocols (OSPF, BGP)","Depends on each link","Depends on each link's medium"],
+  link:"https://en.wikipedia.org/wiki/Mesh_networking"}}
+};
+
+var CMP=[["cost",{bus:5,star:3,ring:3,mesh:1}],["scale",{bus:2,star:4,ring:2,mesh:2}],["fault",{bus:1,star:3,ring:2,mesh:5}],["diag",{bus:2,star:5,ring:3,mesh:4}],["load",{bus:1,star:4,ring:3,mesh:5}]];
+
+/* ===================== v3: dictionary + data ===================== */
+Object.assign(I.es,{
+ nIntro:"Introducción",nMedia:"Medios y equipos",nLab:"Laboratorio",nHist:"Historia",nLearn:"Aprende",nGloss:"Glosario",
+ tTree:"Árbol",presBtn:"Exposición",presHint:"← → para navegar · Esc para salir",presExit:"Salir",aSnd:"Activar o silenciar sonidos",aDots:"Secciones de la página",
+ introTitle:"Por qué importa la forma de una red",
+ introP1:"Antes de enviar un solo dato, una red necesita decidir cómo se conectan sus equipos. Esa disposición, la topología, determina cuánto cable se compra, qué tan rápido se encuentra una falla y si un cable roto afecta a un equipo o a todos.",
+ introP2:"Este trabajo revisa las topologías físicas más importantes, las compara con criterios técnicos y permite probarlas con un simulador de fallas.",
+ objs:[["Objetivo general","Explicar cómo funcionan las topologías físicas de bus, estrella, anillo y malla, y cómo se combinan en redes reales."],["Objetivo específico 1","Describir la estructura, el medio físico y los estándares asociados a cada topología."],["Objetivo específico 2","Comparar ventajas, desventajas y costos de cableado con criterios medibles."],["Objetivo específico 3","Analizar el comportamiento ante fallas mediante simulación interactiva."],["Metodología","Revisión de fuentes académicas y de fabricantes, modelado de cada topología como un grafo de nodos y enlaces, y contraste con casos reales."]],
+ mediaTitle:"Medios físicos y equipos",mediaIntro:"Cada topología se construye con piezas concretas. Estas son las seis que más aparecen en el trabajo.",
+ gear:[["Cable coaxial y terminador","Núcleo de cobre, aislante y malla. El terminador de 50 Ω cierra cada extremo del bus."],["Par trenzado UTP y RJ-45","Cuatro pares trenzados de colores y un conector de ocho pines. Base de las redes en estrella."],["Fibra óptica","Un núcleo de vidrio que transporta luz. Se usa en FDDI, en troncales y en enlaces largos."],["Tarjeta de red (NIC)","Conecta cada equipo al medio. En una malla completa cada equipo necesita muchos puertos."],["Switch","Equipo central que reenvía cada trama solo al puerto de destino."],["Router","Une redes distintas y elige la mejor ruta. Es el nodo típico de una malla parcial."]],
+ demoPlay:"Ver paso a paso",demoStop:"Detener",demoAgain:"Repetir",demoHint:"Pulsa el botón para ver cómo viaja un mensaje en esta topología.",
+ macLbl:"Tabla del switch",port:"Puerto",
+ demo:{
+  bus:["PC1 quiere transmitir. Primero escucha el cable: está libre.","PC1 transmite. La señal viaja en las dos direcciones por todo el bus.","Todos los equipos reciben la señal, pero solo el destinatario la procesa.","Si dos equipos transmiten a la vez, las señales chocan: colisión.","Ambos esperan un tiempo aleatorio y reintentan. Es el método CSMA/CD."],
+  star:["PC1 envía su trama al switch por su cable dedicado.","El switch aprende en qué puerto está PC1 y lo anota en su tabla.","No conoce el destino, así que reenvía la trama por todos los demás puertos.","PC4 responde y el switch aprende también su puerto.","Desde ahora reenvía solo al puerto correcto, sin molestar a los demás."],
+  ring:["Un testigo, una señal especial, circula libre por el anillo.","PC2 quiere transmitir: captura el testigo.","Envía su trama, que viaja de equipo en equipo en un solo sentido.","PC5, el destinatario, copia la trama y la deja seguir hasta volver a PC2.","PC2 retira la trama y libera el testigo. Nunca hubo colisiones."],
+  mesh:["PC1 envía un mensaje a PC4 por el enlace directo.","El enlace entre PC1 y PC4 falla.","El tráfico toma otra ruta: PC1, PC2 y PC4.","La comunicación continúa sin que el usuario note la falla."],
+  tree:["PC1 envía su trama al switch de su rama.","Ese switch no conoce el destino y la sube al switch raíz (core).","El core la baja por la rama correcta y el switch de esa rama la entrega a PC6.","Si falla un switch intermedio solo se pierde su rama. Si falla el core, las ramas quedan separadas."]
+ },
+ labTitle:"Laboratorio",labIntro:"Tres herramientas para comparar topologías con números: un comparador, un estimador de costos y una simulación de confiabilidad.",
+ abTitle:"Comparador",abSub:"Elige dos topologías y compáralas",abA:"Topología A",abB:"Topología B",abPros:"Lo mejor",abCons:"Lo peor",
+ costTitle:"Estimador de costos",costSub:"Valores de ejemplo en pesos colombianos. Ajústalos con cotizaciones reales.",
+ costN:"Equipos",costD:"Distancia promedio (m)",costP:"Cable por metro (COP)",costQ:"Por puerto (COP)",costCable:"Cable",costPorts:"Puertos",costTotal:"Total estimado",
+ relTitle:"Simulación de confiabilidad",relSub:"Cada cable falla con la probabilidad elegida y cada switch con la mitad. Se repite 1.500 veces por topología.",
+ relP:"Probabilidad de falla por cable",relAll:"Todos comunicados",relAvg:"Equipos comunicados (promedio)",
+ relCfg:{bus:"Bus",star:"Estrella",ring_single:"Anillo simple",ring_dual:"Doble anillo",mesh_partial:"Malla parcial",mesh_full:"Malla completa",tree:"Árbol"},
+ histTitle:"Historia en siete hitos",histIntro:"De un memo en 1973 a las mallas inalámbricas de hoy.",
+ timeline:[["1973","Nace Ethernet","Robert Metcalfe escribe el memo que describe cómo funcionaría Ethernet, con un cable compartido: un bus.","bus"],["1983","Ethernet se estandariza","El comité IEEE 802 aprueba Ethernet como estándar, conocido como IEEE 802.3.","bus"],["Años 80","Token Ring","IBM impulsa el anillo con testigo, estandarizado como IEEE 802.5.","ring"],["1987","FDDI","Se publica el estándar ANSI de la interfaz de datos distribuida por fibra: doble anillo a 100 Mb/s.","ring"],["1990","10BASE-T","Ethernet pasa al par trenzado con un equipo central: la estrella se impone en las redes locales.","star"],["1995","Fast Ethernet","Ethernet sube a 100 Mb/s sobre la misma topología en estrella.","tree"],["2011","Mallas inalámbricas","Se publica IEEE 802.11s, que lleva la malla al Wi-Fi.","mesh"]],
+ glTitle:"Glosario",glSearch:"Buscar un término",glNone:"Sin resultados.",
+ gl:[["CSMA/CD","Método de acceso del Ethernet clásico: el equipo escucha antes de transmitir y reintenta tras una colisión."],["Testigo (token)","Señal especial que circula por el anillo. Solo quien la tiene puede transmitir."],["Backbone (troncal)","Enlace principal de alta capacidad que une segmentos o switches."],["Terminador","Resistencia de 50 Ω en cada extremo de un bus coaxial. Evita que la señal rebote."],["NIC","Tarjeta de interfaz de red. Conecta un equipo al medio físico."],["MAU","Unidad de acceso multiestación de Token Ring. Se cablea en estrella pero hace circular el anillo."],["Switch","Equipo que reenvía cada trama solo al puerto donde está el destino."],["Hub","Repetidor que envía la señal a todos los puertos. Hoy casi no se usa."],["Redundancia","Caminos o equipos de reserva que mantienen viva la red ante una falla."],["Trama","Unidad de datos que viaja por la red en la capa de enlace."]],
+ glTerms:[["CSMA/CD",0],["testigo",1],["troncal",2],["terminador",3],["MAU",5],["switch",6],["hub",7],["redundancia",8],["NIC",4]],
+ learnTitle:"Aprende y ponte a prueba",learnIntro:"Un recomendador de cuatro preguntas y un quiz de seis para repasar lo aprendido.",
+ recTitle:"¿Qué topología me conviene?",recQn:"Pregunta",recReset:"Empezar de nuevo",recResult:"Tu mejor opción",recSee:"Ver el capítulo",recScores:"Afinidad de cada topología",
+ rec:[
+  {q:"¿De qué tamaño es tu red?",a:[["Pocos equipos, menos de 10",[2,2,1,1,0]],["Un edificio, decenas de equipos",[0,3,0,1,2]],["Un campus o varias sedes",[0,1,0,2,3]]]},
+  {q:"¿Cómo es el presupuesto?",a:[["Muy ajustado",[3,2,1,0,1]],["Moderado",[0,3,1,0,2]],["Amplio",[0,1,1,3,2]]]},
+  {q:"¿Qué pasa si la red se cae?",a:[["Puedo tolerar interrupciones",[1,2,0,0,1]],["Necesito la mayor disponibilidad posible",[0,0,2,3,1]]]},
+  {q:"¿Va a crecer?",a:[["No, será estable",[2,1,1,0,0]],["Poco a poco",[0,3,0,1,2]],["Mucho",[0,1,0,1,3]]]}
+ ],
+ recWhy:{bus:"Barata y simple para pocos equipos, pero frágil. Úsala solo en redes pequeñas o industriales.",star:"El punto medio ideal: fácil de administrar y de ampliar. Es la base de casi todas las redes locales.",ring:"Acceso ordenado y predecible, y con doble anillo resiste un corte. Hoy se ve sobre todo en redes de operadores.",mesh:"Máxima disponibilidad gracias a las rutas alternas. Cuesta más, así que se aplica al núcleo de la red.",tree:"Estrellas unidas por un núcleo: escala bien para edificios y campus."},
+ quizTitle:"Quiz de seis preguntas",quizNext:"Siguiente",quizFinish:"Ver resultado",quizAgain:"Reintentar",quizOk:"Correcto.",quizBad:"No es esa.",
+ quizScore:function(s,n){return "Obtuviste "+s+" de "+n},
+ quizMsg:["Repasa los capítulos y vuelve a intentarlo.","Buen avance. Revisa los puntos que fallaste.","Muy bien, dominas el tema."],
+ quiz:[
+  {q:"¿Qué topología deja sin servicio a toda la red si se corta el cable troncal?",o:["Estrella","Bus","Malla","Árbol"],c:1,e:"El bus depende de un único cable compartido con terminadores en sus extremos."},
+  {q:"¿Qué dispositivo es el centro de una red en estrella moderna?",o:["Terminador","Tarjeta NIC","Switch","Repetidor coaxial"],c:2,e:"El switch reenvía cada trama solo al puerto del destino."},
+  {q:"¿Qué evita las colisiones en Token Ring?",o:["CSMA/CD","El paso de testigo","Los terminadores","La fibra óptica"],c:1,e:"Solo el equipo que tiene el testigo puede transmitir."},
+  {q:"¿Cuántos enlaces necesita una malla completa de 8 equipos?",o:["8","16","28","56"],c:2,e:"n(n−1)/2 = 8 × 7 / 2 = 28 enlaces."},
+  {q:"¿Qué topología es la más habitual en las redes locales actuales?",o:["Bus","Anillo","Malla completa","Estrella"],c:3,e:"La estrella con switch domina por su facilidad de diagnóstico y administración."},
+  {q:"¿Qué ventaja da el doble anillo de FDDI?",o:["Resiste el corte de un enlace","Más velocidad que Ethernet","No necesita equipos de red","Usa menos cable"],c:0,e:"Dos anillos en sentidos opuestos se reconfiguran cuando un enlace se corta."}
+ ]
+});
+I.es.rule.tree="Un cable roto aísla un equipo, un switch de rama caído aísla su rama y, si cae el core, las ramas quedan separadas.";
+I.es.spof.tree="El switch raíz (core)";
+I.es.today.tree="Estándar en edificios y campus";
+
+Object.assign(I.en,{
+ nIntro:"Introduction",nMedia:"Media and gear",nLab:"Lab",nHist:"History",nLearn:"Learn",nGloss:"Glossary",
+ tTree:"Tree",presBtn:"Present",presHint:"← → to navigate · Esc to exit",presExit:"Exit",aSnd:"Turn sounds on or off",aDots:"Page sections",
+ introTitle:"Why the shape of a network matters",
+ introP1:"Before a single piece of data is sent, a network has to decide how its devices are connected. That layout, the topology, sets how much cable is bought, how fast a fault is found and whether a broken cable affects one device or all of them.",
+ introP2:"This project reviews the main physical topologies, compares them with technical criteria and lets you try them in a failure simulator.",
+ objs:[["General objective","Explain how the bus, star, ring and mesh physical topologies work, and how they are combined in real networks."],["Specific objective 1","Describe the structure, physical medium and standards tied to each topology."],["Specific objective 2","Compare advantages, disadvantages and cabling costs with measurable criteria."],["Specific objective 3","Analyze behavior under failure through interactive simulation."],["Methodology","Review of academic and vendor sources, modeling each topology as a graph of nodes and links, and checking against real cases."]],
+ mediaTitle:"Physical media and equipment",mediaIntro:"Every topology is built from concrete parts. These are the six that appear most in this project.",
+ gear:[["Coaxial cable and terminator","Copper core, insulation and shield. The 50 Ω terminator closes each end of the bus."],["UTP twisted pair and RJ-45","Four color-coded twisted pairs and an eight-pin connector. The basis of star networks."],["Optical fiber","A glass core that carries light. Used in FDDI, backbones and long links."],["Network card (NIC)","Connects each device to the medium. In a full mesh every device needs many ports."],["Switch","Central device that forwards each frame only to the destination port."],["Router","Joins different networks and picks the best route. The typical node of a partial mesh."]],
+ demoPlay:"Watch step by step",demoStop:"Stop",demoAgain:"Replay",demoHint:"Press the button to see how a message travels in this topology.",
+ macLbl:"Switch table",port:"Port",
+ demo:{
+  bus:["PC1 wants to transmit. It first listens to the cable: it is free.","PC1 transmits. The signal travels both ways along the whole bus.","Every device receives the signal, but only the recipient processes it.","If two devices transmit at once, the signals collide.","Both wait a random time and retry. This is the CSMA/CD method."],
+  star:["PC1 sends its frame to the switch over its dedicated cable.","The switch learns which port PC1 is on and records it in its table.","It does not know the destination, so it forwards the frame out of every other port.","PC4 replies and the switch learns its port too.","From now on it forwards only to the right port, without bothering the others."],
+  ring:["A token, a special signal, circulates freely around the ring.","PC2 wants to transmit: it captures the token.","It sends its frame, which travels device to device in one direction.","PC5, the recipient, copies the frame and lets it continue back to PC2.","PC2 removes the frame and releases the token. There were never any collisions."],
+  mesh:["PC1 sends a message to PC4 over the direct link.","The link between PC1 and PC4 fails.","Traffic takes another route: PC1, PC2 and PC4.","Communication continues without the user noticing the fault."],
+  tree:["PC1 sends its frame to the switch of its branch.","That switch does not know the destination and sends it up to the root switch (core).","The core sends it down the right branch and that branch's switch delivers it to PC6.","If an intermediate switch fails only its branch is lost. If the core fails, the branches are cut apart."]
+ },
+ labTitle:"Lab",labIntro:"Three tools to compare topologies with numbers: a comparator, a cost estimator and a reliability simulation.",
+ abTitle:"Comparator",abSub:"Pick two topologies and compare them",abA:"Topology A",abB:"Topology B",abPros:"Best at",abCons:"Worst at",
+ costTitle:"Cost estimator",costSub:"Sample values in Colombian pesos. Adjust them with real quotes.",
+ costN:"Devices",costD:"Average distance (m)",costP:"Cable per meter (COP)",costQ:"Per port (COP)",costCable:"Cable",costPorts:"Ports",costTotal:"Estimated total",
+ relTitle:"Reliability simulation",relSub:"Each cable fails with the chosen probability and each switch with half of it. Repeated 1,500 times per topology.",
+ relP:"Failure probability per cable",relAll:"All communicating",relAvg:"Devices communicating (average)",
+ relCfg:{bus:"Bus",star:"Star",ring_single:"Single ring",ring_dual:"Dual ring",mesh_partial:"Partial mesh",mesh_full:"Full mesh",tree:"Tree"},
+ histTitle:"History in seven milestones",histIntro:"From a memo in 1973 to today's wireless meshes.",
+ timeline:[["1973","Ethernet is born","Robert Metcalfe writes the memo describing how Ethernet would work, with one shared cable: a bus.","bus"],["1983","Ethernet is standardized","The IEEE 802 committee approves Ethernet as a standard, known as IEEE 802.3.","bus"],["1980s","Token Ring","IBM pushes the token-passing ring, standardized as IEEE 802.5.","ring"],["1987","FDDI","The ANSI standard for the fiber distributed data interface is published: a dual ring at 100 Mb/s.","ring"],["1990","10BASE-T","Ethernet moves to twisted pair with a central device: the star takes over local networks.","star"],["1995","Fast Ethernet","Ethernet reaches 100 Mb/s on the same star topology.","tree"],["2011","Wireless meshes","IEEE 802.11s is published, bringing the mesh to Wi-Fi.","mesh"]],
+ glTitle:"Glossary",glSearch:"Search a term",glNone:"No results.",
+ gl:[["CSMA/CD","Access method of classic Ethernet: the device listens before transmitting and retries after a collision."],["Token","Special signal that circulates around the ring. Only its holder may transmit."],["Backbone","High-capacity main link joining segments or switches."],["Terminator","50 Ω resistor at each end of a coaxial bus. It stops the signal from bouncing back."],["NIC","Network interface card. Connects a device to the physical medium."],["MAU","Token Ring multistation access unit. It is wired as a star but circulates the ring."],["Switch","Device that forwards each frame only to the port where the destination is."],["Hub","Repeater that sends the signal out of every port. Rarely used today."],["Redundancy","Spare paths or devices that keep the network alive when something fails."],["Frame","Unit of data that travels the network at the link layer."]],
+ glTerms:[["CSMA/CD",0],["token",1],["backbone",2],["terminator",3],["MAU",5],["switch",6],["hub",7],["redundancy",8],["NIC",4]],
+ learnTitle:"Learn and test yourself",learnIntro:"A four-question recommender and a six-question quiz to review what you learned.",
+ recTitle:"Which topology suits me?",recQn:"Question",recReset:"Start over",recResult:"Your best option",recSee:"See the chapter",recScores:"How well each topology fits",
+ rec:[
+  {q:"How big is your network?",a:[["A few devices, under 10",[2,2,1,1,0]],["One building, dozens of devices",[0,3,0,1,2]],["A campus or several sites",[0,1,0,2,3]]]},
+  {q:"What is the budget like?",a:[["Very tight",[3,2,1,0,1]],["Moderate",[0,3,1,0,2]],["Generous",[0,1,1,3,2]]]},
+  {q:"What happens if the network goes down?",a:[["I can tolerate interruptions",[1,2,0,0,1]],["I need the highest availability possible",[0,0,2,3,1]]]},
+  {q:"Will it grow?",a:[["No, it will stay as is",[2,1,1,0,0]],["Gradually",[0,3,0,1,2]],["A lot",[0,1,0,1,3]]]}
+ ],
+ recWhy:{bus:"Cheap and simple for a few devices, but fragile. Use it only in small or industrial networks.",star:"The ideal middle ground: easy to manage and to expand. It is the basis of almost every local network.",ring:"Orderly, predictable access, and with a dual ring it survives a cut. Today it is seen mostly in carrier networks.",mesh:"Maximum availability thanks to alternative routes. It costs more, so it is applied to the network core.",tree:"Stars joined by a core: scales well for buildings and campuses."},
+ quizTitle:"Six-question quiz",quizNext:"Next",quizFinish:"See result",quizAgain:"Try again",quizOk:"Correct.",quizBad:"Not that one.",
+ quizScore:function(s,n){return "You scored "+s+" out of "+n},
+ quizMsg:["Review the chapters and try again.","Good progress. Check the points you missed.","Well done, you know the topic."],
+ quiz:[
+  {q:"Which topology takes the whole network down if the backbone cable is cut?",o:["Star","Bus","Mesh","Tree"],c:1,e:"The bus relies on one shared cable with terminators at its ends."},
+  {q:"Which device is the center of a modern star network?",o:["Terminator","NIC card","Switch","Coaxial repeater"],c:2,e:"The switch forwards each frame only to the destination port."},
+  {q:"What prevents collisions in Token Ring?",o:["CSMA/CD","Token passing","Terminators","Optical fiber"],c:1,e:"Only the device holding the token may transmit."},
+  {q:"How many links does a full mesh of 8 devices need?",o:["8","16","28","56"],c:2,e:"n(n−1)/2 = 8 × 7 / 2 = 28 links."},
+  {q:"Which topology is the most common in today's local networks?",o:["Bus","Ring","Full mesh","Star"],c:3,e:"The switched star dominates for its ease of troubleshooting and management."},
+  {q:"What advantage does FDDI's dual ring give?",o:["It survives a cut link","More speed than Ethernet","It needs no network gear","It uses less cable"],c:0,e:"Two rings in opposite directions reconfigure when a link is cut."}
+ ]
+});
+I.en.rule.tree="A broken cable isolates one device, a failed branch switch isolates its branch and, if the core fails, the branches are cut apart.";
+I.en.spof.tree="The root switch (core)";
+I.en.today.tree="Standard in buildings and campuses";
+
+TP.tree={
+ es:{name:"Topología en árbol",tag:"Estrellas unidas por un núcleo",
+  def:"Varias estrellas se conectan entre sí mediante un switch raíz, o núcleo. Es una estrella de estrellas, y la base de las redes de edificios y campus.",
+  how:"Cada grupo de equipos cuelga de un switch de acceso, y esos switches se unen al núcleo por enlaces troncales. El tráfico entre ramas sube al núcleo y baja por la rama correcta. Una topología híbrida mezcla este esquema con otros, por ejemplo un árbol con malla parcial en el núcleo.",
+  pros:["Escala por ramas: se agregan equipos o switches sin rehacer la red","Una falla en una rama no afecta a las demás","Fácil de administrar y de segmentar por departamentos","Se puede combinar con malla en el núcleo (híbrida)"],
+  cons:["Si falla el núcleo, las ramas quedan separadas","Más cableado y más equipos que una estrella simple","El rendimiento depende de los enlaces troncales","Una mala planificación genera cuellos de botella en el núcleo"],
+  uses:["Redes de edificios, universidades y hospitales con switches de acceso y de núcleo","Redes de oficinas con varios pisos y centros de datos"],
+  sheet:["Par trenzado en los accesos y fibra óptica en los troncales","IEEE 802.3 (Ethernet conmutada)","Según el enlace: 1 Gb/s o más en accesos y troncales","100 m en par trenzado; más en fibra"],
+  link:"https://www.guru99.com/es/type-of-network-topology.html"},
+ en:{name:"Tree topology",tag:"Stars joined by a core",
+  def:"Several stars are connected to each other through a root switch, or core. It is a star of stars, and the basis of building and campus networks.",
+  how:"Each group of devices hangs off an access switch, and those switches join the core over backbone links. Traffic between branches goes up to the core and down the right branch. A hybrid topology mixes this layout with others, for example a tree with a partial mesh in the core.",
+  pros:["Scales by branches: devices or switches are added without rebuilding the network","A fault in one branch does not affect the others","Easy to manage and to segment by department","Can be combined with a mesh in the core (hybrid)"],
+  cons:["If the core fails, the branches are cut apart","More cabling and gear than a simple star","Performance depends on the backbone links","Poor planning creates bottlenecks in the core"],
+  uses:["Networks of buildings, universities and hospitals with access and core switches","Multi-floor office networks and data centers"],
+  sheet:["Twisted pair at the access layer and optical fiber on the backbones","IEEE 802.3 (switched Ethernet)","Depends on the link: 1 Gb/s or more on access and backbones","100 m on twisted pair; more on fiber"],
+  link:"https://en.wikipedia.org/wiki/Network_topology"}
+};
+CMP[0][1].tree=3;CMP[1][1].tree=5;CMP[2][1].tree=2;CMP[3][1].tree=4;CMP[4][1].tree=3;
+
+function L(){return I[lang]}
+
+/* ---------- layout (shared by diagrams and simulator) ---------- */
+function layout(type,W,H,o){
+  o=o||{};
+  var cx=W/2,cy=H/2,R=Math.min(W,H)*0.36,n=6,nodes=[],links=[],i;
+  function circ(k){var a=-Math.PI/2+k*2*Math.PI/n;return{x:cx+R*Math.cos(a),y:cy+R*Math.sin(a)}}
+  if(type==="star"){
+    nodes.push({id:"H",kind:"hub",label:"SW",x:cx,y:cy});
+    for(i=0;i<n;i++){var p=circ(i);nodes.push({id:"N"+i,idx:i,kind:"pc",x:p.x,y:p.y});links.push({id:"L"+i,a:"H",b:"N"+i,kind:"lk"})}
+  }else if(type==="tree"){
+    var sxs=[W*0.27,W*0.73],dxx=W*0.13;
+    nodes.push({id:"C",kind:"hub",label:"CORE",x:cx,y:H*0.14});
+    for(i=0;i<2;i++){nodes.push({id:"S"+i,kind:"hub",label:"SW"+(i+1),x:sxs[i],y:H*0.46});links.push({id:"U"+i,a:"C",b:"S"+i,kind:"up"})}
+    for(i=0;i<n;i++){var sI=Math.floor(i/3);nodes.push({id:"N"+i,idx:i,kind:"pc",x:sxs[sI]+(i%3-1)*dxx,y:H*0.84});links.push({id:"L"+i,a:"S"+sI,b:"N"+i,kind:"lk"})}
+  }else if(type==="bus"){
+    var x0=W*0.08,x1=W*0.92,off=R*0.62;
+    nodes.push({id:"E0",kind:"term",x:x0,y:cy},{id:"E1",kind:"term",x:x1,y:cy});
+    for(i=0;i<n;i++){
+      var tx=x0+(x1-x0)*(i+0.5)/n;
+      nodes.push({id:"T"+i,kind:"tap",x:tx,y:cy});
+      nodes.push({id:"N"+i,idx:i,kind:"pc",x:tx,y:(i%2)?cy+off:cy-off});
+      links.push({id:"D"+i,a:"T"+i,b:"N"+i,kind:"drop"});
+    }
+    links.push({id:"B-1",a:"E0",b:"T0",kind:"bb"});
+    for(i=0;i<n-1;i++)links.push({id:"B"+i,a:"T"+i,b:"T"+(i+1),kind:"bb"});
+    links.push({id:"B"+(n-1),a:"T"+(n-1),b:"E1",kind:"bb"});
+  }else{
+    for(i=0;i<n;i++){var q=circ(i);nodes.push({id:"N"+i,idx:i,kind:"pc",x:q.x,y:q.y})}
+    if(type==="ring"){for(i=0;i<n;i++)links.push({id:"L"+i,a:"N"+i,b:"N"+((i+1)%n),kind:"lk"})}
+    else if(o.mesh==="partial"){
+      for(i=0;i<n;i++)links.push({id:"L"+i,a:"N"+i,b:"N"+((i+1)%n),kind:"lk"});
+      for(i=0;i<3;i++)links.push({id:"X"+i,a:"N"+i,b:"N"+(i+3),kind:"lk"});
+    }else{
+      for(i=0;i<n;i++)for(var j=i+1;j<n;j++)links.push({id:"L"+i+"_"+j,a:"N"+i,b:"N"+j,kind:"lk"});
+    }
+  }
+  var by={};nodes.forEach(function(nd){by[nd.id]=nd});
+  return{nodes:nodes,links:links,by:by,W:W,H:H,cx:cx,cy:cy,R:R};
+}
+function nm(nd){if(nd.kind==="hub")return nd.id==="H"?L().sw:nd.id==="C"?"Core":L().sw+" "+(+nd.id.slice(1)+1);if(nd.kind==="pc")return L().pc+(nd.idx+1);return""}
+
+/* ---------- static diagrams ---------- */
+function pkt(path,dur,begin){return '<circle class="pk" r="4.5"><animateMotion dur="'+dur+'s" begin="'+begin+'s" repeatCount="indefinite" path="'+path+'"/></circle>'}
+function drawStatic(svg,type){
+  var W=400,H=300,G=layout(type,W,H,{mesh:"full"}),ls="",ns="",k="";
+  G.links.forEach(function(l){var a=G.by[l.a],b=G.by[l.b];ls+='<line class="lk'+(l.kind==="bb"?" bb":"")+'" x1="'+a.x+'" y1="'+a.y+'" x2="'+b.x+'" y2="'+b.y+'"/>'});
+  G.nodes.forEach(function(nd){
+    var ns0=ns;
+    if(nd.kind==="pc")ns+='<circle class="nd" cx="'+nd.x+'" cy="'+nd.y+'" r="15"/><text class="nt" x="'+nd.x+'" y="'+nd.y+'">'+(nd.idx+1)+'</text>';
+    else if(nd.kind==="hub")ns+='<rect class="hubr" x="'+(nd.x-24)+'" y="'+(nd.y-16)+'" width="48" height="32" rx="8"/><text class="ht" x="'+nd.x+'" y="'+nd.y+'">'+(nd.label||"SW")+'</text>';
+    else if(nd.kind==="tap")ns+='<circle class="tapd" cx="'+nd.x+'" cy="'+nd.y+'" r="4"/>';
+    else if(nd.kind==="term")ns+='<rect class="trm" x="'+(nd.x-3)+'" y="'+(nd.y-12)+'" width="6" height="24" rx="2"/><text class="trt" x="'+nd.x+'" y="'+(nd.y+26)+'">50 Ω</text>';
+    if(nd.kind==="pc"||nd.kind==="hub"){ns=ns0+'<g><title>'+nm(nd)+'</title>'+ns.slice(ns0.length)+'</g>'}
+  });
+  var i,a,b;
+  if(type==="star"){
+    var h=G.by.H;
+    for(i=0;i<6;i++){a=G.by["N"+i];k+=pkt("M"+a.x+" "+a.y+" L"+h.x+" "+h.y,2.4,-i*0.4)}
+    for(i=0;i<3;i++){b=G.by["N"+(i+3)];k+=pkt("M"+h.x+" "+h.y+" L"+b.x+" "+b.y,2.4,-i*0.8-0.2)}
+  }else if(type==="bus"){
+    var e0=G.by.E0,e1=G.by.E1;
+    k+=pkt("M"+e0.x+" "+e0.y+" L"+e1.x+" "+e1.y,3.4,0);
+    k+=pkt("M"+e1.x+" "+e1.y+" L"+e0.x+" "+e0.y,3.8,-1.4);
+    var n0=G.by.N0,t0=G.by.T0,n3=G.by.N3,t3=G.by.T3;
+    k+=pkt("M"+n0.x+" "+n0.y+" L"+t0.x+" "+t0.y,1.6,0);
+    k+=pkt("M"+t3.x+" "+t3.y+" L"+n3.x+" "+n3.y,1.6,-0.8);
+  }else if(type==="tree"){
+    var cc=G.by.C,q0=G.by.S0,q1=G.by.S1,m0=G.by.N0,m5=G.by.N5,m4=G.by.N4,m1=G.by.N1,m2=G.by.N2;
+    k+=pkt("M"+m0.x+" "+m0.y+" L"+q0.x+" "+q0.y+" L"+cc.x+" "+cc.y+" L"+q1.x+" "+q1.y+" L"+m5.x+" "+m5.y,5.2,0);
+    k+=pkt("M"+m4.x+" "+m4.y+" L"+q1.x+" "+q1.y+" L"+cc.x+" "+cc.y+" L"+q0.x+" "+q0.y+" L"+m1.x+" "+m1.y,5.2,-2.6);
+    k+=pkt("M"+m2.x+" "+m2.y+" L"+q0.x+" "+q0.y,1.8,-0.6);
+  }else if(type==="ring"){
+    var R=G.R,cx=G.cx,cy=G.cy,d="M"+(cx)+" "+(cy-R)+" A"+R+" "+R+" 0 1 1 "+(cx)+" "+(cy+R)+" A"+R+" "+R+" 0 1 1 "+(cx)+" "+(cy-R);
+    ls='<circle class="lk" cx="'+cx+'" cy="'+cy+'" r="'+R+'"/>';
+    k+=pkt(d,7,0)+pkt(d,7,-3.5);
+  }else{
+    G.links.forEach(function(l,idx){if(idx%2===0){var A=G.by[l.a],B=G.by[l.b];k+=pkt(idx%4===0?"M"+A.x+" "+A.y+" L"+B.x+" "+B.y:"M"+B.x+" "+B.y+" L"+A.x+" "+A.y,2.6,-idx*0.37)}});
+  }
+  svg.innerHTML=ls+k+ns;
+  try{if(matchMedia("(prefers-reduced-motion: reduce)").matches&&svg.pauseAnimations)svg.pauseAnimations()}catch(e){}
+}
+
+/* ---------- chapters ---------- */
+function renderChapters(){
+  var t=L(),host=$("#chapters"),h="";
+  TYPES.forEach(function(ty,ix){
+    var d=TP[ty][lang],lk=["sMedium","sStd","sSpeed","sReach"];
+    h+='<article class="chapter t-'+ty+(ix%2?" rev":"")+'" id="'+ty+'">'
+     +'<div class="ch-vis"><div class="card diagram"><svg id="dg-'+ty+'" viewBox="0 0 400 300" role="img" aria-label="'+d.name+'"></svg>'
+     +'<div class="demo" data-dw="'+ty+'"><div class="demo-top"><button type="button" class="btn small" data-demo="'+ty+'">&#9654; '+t.demoPlay+'</button><span class="dstep"></span></div><div class="dprog"></div><p class="dtext">'+t.demoHint+'</p><div class="mac" hidden></div></div>'
+     +'<dl class="sheet">'+lk.map(function(key,j){return '<dt>'+t[key]+'</dt><dd>'+d.sheet[j]+'</dd>'}).join("")+'</dl></div></div>'
+     +'<div class="ch-txt"><div class="ch-kicker"><i></i><span class="label">'+t["t"+ty.charAt(0).toUpperCase()+ty.slice(1)]+'</span></div>'
+     +'<h2>'+d.name+'</h2><p class="ch-tag">'+d.tag+'</p>'
+     +'<p>'+d.def+'</p><p><strong>'+t.how+'.</strong> '+d.how+'</p>'
+     +'<div class="pc"><div><h4>'+t.pros+'</h4><ul class="pm pro">'+d.pros.map(function(x){return '<li>'+x+'</li>'}).join("")+'</ul></div>'
+     +'<div><h4>'+t.cons+'</h4><ul class="pm con">'+d.cons.map(function(x){return '<li>'+x+'</li>'}).join("")+'</ul></div></div>'
+     +'<div class="uses"><h4>'+t.uses+'</h4><ul class="us">'+d.uses.map(function(x){return '<li>'+x+'</li>'}).join("")+'</ul></div>'
+     +'<div class="row">'+(MORE[lang][ty]||[[t.more,d.link]]).map(function(m){return '<a class="btn" href="'+m[1]+'" target="_blank" rel="noopener noreferrer">'+t.more+': '+m[0]+' &#8599;</a>'}).join("")+'</div></div></article>';
+  });
+  host.innerHTML=h;
+  TYPES.forEach(function(ty){drawStatic($("#dg-"+ty),ty)});
+}
+
+/* ---------- hero canvas ---------- */
+function heroNet(){
+  var cv=$("#heroCanvas"),ctx=cv.getContext("2d");
+  if(!ctx)return;
+  var W=0,H=0,pts=[],pk=[],col={},frame=0,run=true,visible=true,reduce=false,MS={x:0,y:0,on:false};
+  try{reduce=matchMedia("(prefers-reduced-motion: reduce)").matches}catch(e){}
+  function rc(){var cs=getComputedStyle(document.documentElement);["line-strong","accent","bus","star","ring","mesh"].forEach(function(k){col[k]=cs.getPropertyValue("--"+k).trim()||"#888"})}
+  var seed=7;function rnd(){seed=(seed*16807)%2147483647;return(seed-1)/2147483646}
+  function init(){
+    var r=cv.parentElement.getBoundingClientRect(),dpr=Math.min(window.devicePixelRatio||1,2);
+    W=r.width;H=r.height;cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);
+    var n=Math.round(Math.max(16,Math.min(40,W*H/15000))),cs=["bus","star","ring","mesh"];
+    seed=7;pts=[];pk=[];
+    for(var i=0;i<n;i++)pts.push({x:rnd()*W,y:rnd()*H,vx:(rnd()-.5)*.22,vy:(rnd()-.5)*.22,c:cs[i%4]});
+    rc();draw();
+  }
+  function near(i){var o=[],p=pts[i];for(var j=0;j<pts.length;j++){if(j===i)continue;var d=Math.hypot(pts[j].x-p.x,pts[j].y-p.y);if(d<150)o.push([j,d])}return o}
+  function draw(){
+    ctx.clearRect(0,0,W,H);ctx.lineWidth=1.2;
+    var i,j;
+    for(i=0;i<pts.length;i++)for(j=i+1;j<pts.length;j++){var d=Math.hypot(pts[i].x-pts[j].x,pts[i].y-pts[j].y);if(d<150){ctx.globalAlpha=(1-d/150)*0.8;ctx.strokeStyle=col["line-strong"];ctx.beginPath();ctx.moveTo(pts[i].x,pts[i].y);ctx.lineTo(pts[j].x,pts[j].y);ctx.stroke()}}
+    if(MS.on){for(i=0;i<pts.length;i++){var dm=Math.hypot(pts[i].x-MS.x,pts[i].y-MS.y);if(dm<190){ctx.globalAlpha=(1-dm/190)*0.95;ctx.strokeStyle=col.accent;ctx.lineWidth=1.6;ctx.beginPath();ctx.moveTo(MS.x,MS.y);ctx.lineTo(pts[i].x,pts[i].y);ctx.stroke()}}ctx.lineWidth=1.2;ctx.globalAlpha=1;ctx.fillStyle=col.accent;ctx.shadowBlur=18;ctx.shadowColor=col.accent;ctx.beginPath();ctx.arc(MS.x,MS.y,5.5,0,6.2832);ctx.fill();ctx.shadowBlur=0}
+    ctx.globalAlpha=1;
+    ctx.shadowBlur=14;pts.forEach(function(p){ctx.shadowColor=col[p.c];ctx.fillStyle=col[p.c];ctx.beginPath();ctx.arc(p.x,p.y,4.6,0,6.2832);ctx.fill()});ctx.shadowBlur=0;
+    pk.forEach(function(q){var a=pts[q.a],b=pts[q.b];ctx.fillStyle=col.accent;ctx.beginPath();ctx.arc(a.x+(b.x-a.x)*q.t,a.y+(b.y-a.y)*q.t,3.2,0,6.2832);ctx.fill()});
+  }
+  function step(){
+    frame++;
+    if(frame%90===0)rc();
+    pts.forEach(function(p){p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>W)p.vx*=-1;if(p.y<0||p.y>H)p.vy*=-1;
+      if(MS.on){var dx=MS.x-p.x,dy=MS.y-p.y,d=Math.hypot(dx,dy);if(d<200&&d>1){var f=(1-d/200)*1.5*(d>60?1:-1);p.x+=dx/d*f;p.y+=dy/d*f}}});
+    if(frame%18===0&&pk.length<12){var a=Math.floor(Math.random()*pts.length),nb=near(a);if(nb.length){pk.push({a:a,b:nb[Math.floor(Math.random()*nb.length)][0],t:0})}}
+    pk.forEach(function(q){q.t+=0.014});
+    pk=pk.filter(function(q){return q.t<1&&Math.hypot(pts[q.a].x-pts[q.b].x,pts[q.a].y-pts[q.b].y)<190});
+    draw();
+  }
+  function loop(){if(run&&visible&&!reduce)step();requestAnimationFrame(loop)}
+  init();
+  window.addEventListener("pointermove",function(e){var r=cv.getBoundingClientRect();MS.x=e.clientX-r.left;MS.y=e.clientY-r.top;MS.on=MS.x>=0&&MS.y>=0&&MS.x<=r.width&&MS.y<=r.height});
+  window.addEventListener("resize",function(){init()});
+  try{new IntersectionObserver(function(e){visible=e[0].isIntersecting}).observe(cv)}catch(e){}
+  try{new MutationObserver(function(){rc();draw()}).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
+    matchMedia("(prefers-color-scheme: dark)").addEventListener("change",function(){rc();draw()})}catch(e){}
+  if(!reduce)requestAnimationFrame(loop);
+}
+
+/* ---------- simulator ---------- */
+var SIM={type:"star",ring:"single",mesh:"full",nodes:{},links:{},busy:false};
+function cnt(o){return Object.keys(o).length}
+function simL(){return layout(SIM.type,600,400,{mesh:SIM.mesh})}
+function isDual(){return SIM.type==="ring"&&SIM.ring==="dual"}
+function ruleKey(){return SIM.type==="ring"?"ring_"+SIM.ring:SIM.type==="mesh"?"mesh_"+SIM.mesh:SIM.type}
+
+function analyze(G,S){
+  S=S||SIM;
+  var pcs=G.nodes.filter(function(n){return n.kind==="pc"});
+  var alive=pcs.filter(function(n){return !S.nodes[n.id]});
+  var up={},act={},nf=cnt(S.nodes),lf=cnt(S.links);
+  if(S.type==="bus"){
+    var bb=G.links.some(function(l){return l.kind==="bb"&&S.links[l.id]});
+    if(!bb)alive.forEach(function(n){if(!S.links["D"+n.idx])up[n.id]=1});
+  }else if(S.type==="ring"&&S.ring==="single"){
+    if(nf===0&&lf===0)pcs.forEach(function(n){up[n.id]=1});
+  }else{
+    var adj={};G.nodes.forEach(function(n){adj[n.id]=[]});
+    G.links.forEach(function(l){if(S.links[l.id]||S.nodes[l.a]||S.nodes[l.b])return;adj[l.a].push(l.b);adj[l.b].push(l.a)});
+    var seen={},best=[],bestAll=[];
+    G.nodes.forEach(function(n){
+      if(S.nodes[n.id]||seen[n.id])return;
+      var q=[n.id],comp=[];seen[n.id]=1;
+      while(q.length){var c=q.shift();comp.push(c);adj[c].forEach(function(x){if(!seen[x]){seen[x]=1;q.push(x)}})}
+      var cp=comp.filter(function(id){return G.by[id].kind==="pc"});
+      if(cp.length>best.length){best=cp;bestAll=comp}
+    });
+    best.forEach(function(id){up[id]=1});
+    if(best.length>=2)bestAll.forEach(function(id){act[id]=1});
+  }
+  if(cnt(up)<2){up={};act={}}
+  return{up:up,alive:alive,pcs:pcs,act:act};
+}
+
+function route(G,s,d){
+  if(SIM.type==="ring"&&SIM.ring==="single"){
+    var p=[s],i=G.by[s].idx;
+    while("N"+i!==d){i=(i+1)%6;p.push("N"+i)}
+    return p;
+  }
+  var adj={};G.nodes.forEach(function(n){adj[n.id]=[]});
+  G.links.forEach(function(l){if(SIM.links[l.id]||SIM.nodes[l.a]||SIM.nodes[l.b])return;adj[l.a].push(l.b);adj[l.b].push(l.a)});
+  var prev={},q=[s];prev[s]=null;
+  while(q.length){var c=q.shift();if(c===d)break;adj[c].forEach(function(x){if(!(x in prev)){prev[x]=c;q.push(x)}})}
+  if(!(d in prev))return null;
+  var path=[],cur=d;while(cur!==null){path.unshift(cur);cur=prev[cur]}
+  return path;
+}
+
+function linkName(G,l){
+  var t=L(),a=G.by[l.a],b=G.by[l.b];
+  if(l.kind==="bb")return t.bbName;
+  if(l.kind==="drop")return t.drop(t.pc+(b.idx+1));
+  return nm(a)+"–"+nm(b);
+}
+
+function setLog(m){$("#logTxt").textContent=m}
+
+function simRender(){
+  var t=L(),G=simL(),A=analyze(G),s="",k;
+  $("#simCard").className="card sim-card t-"+SIM.type;
+  var linkSvg="",nodeSvg="";
+  G.links.forEach(function(l){
+    var a=G.by[l.a],b=G.by[l.b],bad=!!SIM.links[l.id];
+    var live=!bad&&!SIM.nodes[l.a]&&!SIM.nodes[l.b]&&(A.up[l.a]||A.up[l.b]||(A.act[l.a]&&A.act[l.b])||l.kind==="bb"&&cnt(A.up)>0);
+    var cls="slk"+(l.kind==="bb"?" bb":"")+(isDual()&&!bad?" dual":"")+(bad?" bad":live?" on":"");
+    var geom='x1="'+a.x+'" y1="'+a.y+'" x2="'+b.x+'" y2="'+b.y+'"';
+    linkSvg+='<g data-link="'+l.id+'"><line class="'+cls+'" '+geom+'/>';
+    if(isDual()&&!bad)linkSvg+='<line class="slk inner" '+geom+'/>';
+    linkSvg+='<line class="hit" '+geom+'/>';
+    if(bad){var mx=(a.x+b.x)/2,my=(a.y+b.y)/2;linkSvg+='<path class="sx" d="M'+(mx-7)+' '+(my-7)+' L'+(mx+7)+' '+(my+7)+' M'+(mx+7)+' '+(my-7)+' L'+(mx-7)+' '+(my+7)+'"/>'}
+    linkSvg+='</g>';
+  });
+  G.nodes.forEach(function(n){
+    if(n.kind==="tap")nodeSvg+='<circle class="tapd" cx="'+n.x+'" cy="'+n.y+'" r="4" style="fill:var(--c)"/>';
+    else if(n.kind==="term")nodeSvg+='<rect class="trm" x="'+(n.x-3)+'" y="'+(n.y-12)+'" width="6" height="24" rx="2"/><text class="trt" x="'+n.x+'" y="'+(n.y+28)+'">50 Ω</text>';
+    else if(n.kind==="hub"){
+      var hc=SIM.nodes[n.id]?"bad":(A.act[n.id]?"up":"");
+      nodeSvg+='<g data-node="'+n.id+'" tabindex="0" role="button" aria-label="'+nm(n)+'"><rect class="shub '+hc+'" x="'+(n.x-28)+'" y="'+(n.y-19)+'" width="56" height="38" rx="9"/><text class="ht" x="'+n.x+'" y="'+n.y+'">'+(n.label||"SW")+'</text></g>';
+    }else{
+      var c=SIM.nodes[n.id]?"bad":A.up[n.id]?"up":"iso";
+      nodeSvg+='<g data-node="'+n.id+'" tabindex="0" role="button" aria-label="'+t.pc+(n.idx+1)+'"><circle class="snd '+c+'" cx="'+n.x+'" cy="'+n.y+'" r="19"/><text class="nt" x="'+n.x+'" y="'+n.y+'">'+(n.idx+1)+'</text></g>';
+    }
+  });
+  s=linkSvg+nodeSvg;
+  $("#simSvg").innerHTML=s;
+
+  var nf=cnt(SIM.nodes),lf=cnt(SIM.links),up=cnt(A.up),state;
+  if(nf+lf===0)state="ok";
+  else if(up===0)state="down";
+  else if(up===A.alive.length)state="tolerated";
+  else state="degraded";
+  if(nf+lf===0&&up<6)state="ok";
+  var txt=state==="ok"?t.stOk:state==="tolerated"?t.stTol:state==="down"?t.stDown:t.stDeg(A.alive.length-up);
+  $("#stateBox").setAttribute("data-s",state);
+  $("#stateTxt").textContent=txt;
+  $("#mUp").textContent=up+" / 6";
+  $("#mCuts").textContent=lf;
+  $("#mOff").textContent=nf;
+  $("#mLinks").textContent=G.links.length;
+  $("#ruleTxt").textContent=t.rule[ruleKey()];
+}
+
+function renderModes(){
+  var t=L(),row=$("#modeRow"),wrap=$("#modeWrap"),opts=null;
+  if(SIM.type==="ring")opts=[["single",t.mSingle],["dual",t.mDual]];
+  if(SIM.type==="mesh")opts=[["full",t.mFull],["partial",t.mPartial]];
+  if(!opts){wrap.hidden=true;row.innerHTML="";return}
+  wrap.hidden=false;
+  row.innerHTML=opts.map(function(o){return '<button type="button" data-mode="'+o[0]+'" aria-pressed="'+(SIM[SIM.type]===o[0])+'">'+o[1]+'</button>'}).join("");
+}
+function renderTabs(){
+  $$("#simTabs button").forEach(function(b){b.setAttribute("aria-pressed",b.getAttribute("data-sim")===SIM.type?"true":"false")});
+  $("#ctl").className="card ctl t-"+SIM.type;
+}
+function simReset(msg){SIM.nodes={};SIM.links={};renderTabs();renderModes();simRender();setLog(msg===false?"":L().resetMsg)}
+
+function toggleNode(id){
+  var G=simL(),n=G.by[id],t=L();if(!n||SIM.busy)return;
+  if(SIM.nodes[id]){delete SIM.nodes[id];setLog(t.onMsg(nm(n)))}else{SIM.nodes[id]=1;setLog(t.offMsg(nm(n)))}
+  simRender();
+}
+function toggleLink(id){
+  var G=simL(),l=G.links.filter(function(x){return x.id===id})[0],t=L();if(!l||SIM.busy)return;
+  if(SIM.links[id]){delete SIM.links[id];setLog(t.fixMsg(linkName(G,l)))}else{SIM.links[id]=1;setLog(t.cutMsg(linkName(G,l)))}
+  simRender();
+}
+function pick(a){return a[Math.floor(Math.random()*a.length)]}
+
+function sendPacket(){
+  if(SIM.busy)return;
+  var t=L(),G=simL(),A=analyze(G);
+  if(A.alive.length<2){setLog(t.need2);return}
+  var src=pick(A.alive),dst=pick(A.alive.filter(function(n){return n.id!==src.id}));
+  var sn=t.pc+(src.idx+1),dn=t.pc+(dst.idx+1);
+  if(!A.up[src.id]||!A.up[dst.id]){setLog(t.noRoute(sn,dn));return}
+  var path=route(G,src.id,dst.id);
+  if(!path){setLog(t.noRoute(sn,dn));return}
+  var shown=path.filter(function(id){var k=G.by[id].kind;return k==="pc"||k==="hub"}).map(function(id){return nm(G.by[id])});
+  var msg=t.pktOk(sn,dn,shown.join(" → "),path.length-1)+(SIM.type==="bus"?t.busNote:"");
+  var pts=path.map(function(id){return G.by[id]}),segs=[],total=0;
+  for(var i=0;i<pts.length-1;i++){var d=Math.hypot(pts[i+1].x-pts[i].x,pts[i+1].y-pts[i].y);segs.push(d);total+=d}
+  var svg=$("#simSvg"),dot=document.createElementNS("http://www.w3.org/2000/svg","circle");
+  dot.setAttribute("class","spkt");dot.setAttribute("r","7");dot.setAttribute("cx",pts[0].x);dot.setAttribute("cy",pts[0].y);svg.appendChild(dot);
+  var reduce=false;try{reduce=matchMedia("(prefers-reduced-motion: reduce)").matches}catch(e){}
+  var dur=reduce?0:Math.max(700,total*3.2),t0=null;SIM.busy=true;
+  setLog("…");
+  function fin(){SIM.busy=false;if(dot.parentNode)dot.parentNode.removeChild(dot);setLog(msg)}
+  function frame(ts){
+    if(t0===null)t0=ts;
+    var p=Math.min(1,(ts-t0)/dur),dist=p*total,j=0;
+    while(j<segs.length-1&&dist>segs[j]){dist-=segs[j];j++}
+    var f=segs[j]?Math.min(1,dist/segs[j]):1;
+    dot.setAttribute("cx",pts[j].x+(pts[j+1].x-pts[j].x)*f);dot.setAttribute("cy",pts[j].y+(pts[j+1].y-pts[j].y)*f);
+    if(p<1)requestAnimationFrame(frame);else fin();
+  }
+  if(reduce)fin();else requestAnimationFrame(frame);
+}
+
+function wireSim(){
+  $("#simTabs").addEventListener("click",function(e){var b=e.target.closest("button[data-sim]");if(!b||SIM.busy)return;SIM.type=b.getAttribute("data-sim");simReset(false)});
+  $("#modeRow").addEventListener("click",function(e){var b=e.target.closest("button[data-mode]");if(!b||SIM.busy)return;SIM[SIM.type]=b.getAttribute("data-mode");simReset(false)});
+  var svg=$("#simSvg");
+  svg.addEventListener("click",function(e){
+    var n=e.target.closest("[data-node]");if(n){toggleNode(n.getAttribute("data-node"));return}
+    var l=e.target.closest("[data-link]");if(l)toggleLink(l.getAttribute("data-link"));
+  });
+  svg.addEventListener("keydown",function(e){
+    if(e.key!=="Enter"&&e.key!==" ")return;
+    var n=e.target.closest("[data-node]");if(n){e.preventDefault();var id=n.getAttribute("data-node");toggleNode(id);var g=$('[data-node="'+id+'"]',svg);if(g)g.focus()}
+  });
+  $("#bSend").addEventListener("click",sendPacket);
+  $("#bReset").addEventListener("click",function(){if(!SIM.busy)simReset()});
+  $("#bCut").addEventListener("click",function(){
+    if(SIM.busy)return;var G=simL(),free=G.links.filter(function(l){return !SIM.links[l.id]});
+    if(!free.length){setLog(L().noneMsg);return}toggleLink(pick(free).id);
+  });
+  $("#bOff").addEventListener("click",function(){
+    if(SIM.busy)return;var G=simL(),free=G.nodes.filter(function(n){return n.kind==="pc"&&!SIM.nodes[n.id]});
+    if(!free.length){setLog(L().noneOff);return}toggleNode(pick(free).id);
+  });
+}
+
+/* ---------- comparison + calculator ---------- */
+function renderCmp(){
+  var t=L(),h='<thead><tr><th>'+t.cmpTop+'</th>'+TYPES.map(function(ty){return '<th class="tc t-'+ty+'">'+t["t"+ty.charAt(0).toUpperCase()+ty.slice(1)]+'</th>'}).join("")+'</tr></thead><tbody>';
+  CMP.forEach(function(r){
+    h+='<tr><td><strong>'+t.cmpRows[r[0]]+'</strong></td>'+TYPES.map(function(ty){
+      var v=r[1][ty],d="";for(var i=1;i<=5;i++)d+='<i'+(i<=v?' class="on"':'')+'></i>';
+      return '<td class="v t-'+ty+'"><span class="dots" role="img" aria-label="'+v+' / 5">'+d+'</span></td>';
+    }).join("")+'</tr>';
+  });
+  ["spof","today"].forEach(function(k){h+='<tr><td><strong>'+t.cmpRows[k]+'</strong></td>'+TYPES.map(function(ty){return '<td>'+t[k][ty]+'</td>'}).join("")+'</tr>'});
+  $("#cmpTbl").innerHTML=h+'</tbody>';
+}
+function renderCalc(){
+  var t=L(),n=+$("#nRange").value;$("#nVal").textContent=n;
+  var maxL=n*(n-1)/2,maxP=n-1;
+  var rows=[["bus",1,1,t.calcShared],["star",n,1],["ring",n,2],["mesh",maxL,n-1],["tree",n+Math.ceil(n/8),1]];
+  $("#calcRows").innerHTML=rows.map(function(r){
+    var ty=r[0],lw=Math.max(2,r[1]/maxL*100),pw=Math.max(2,r[2]/maxP*100);
+    return '<div class="crow t-'+ty+'"><h3>'+t["t"+ty.charAt(0).toUpperCase()+ty.slice(1)]+'</h3>'
+     +'<div class="bl"><span class="bn">'+t.calcLinks+'</span><div class="bar-t"><span style="width:'+lw+'%"></span></div><span>'+(r[3]||r[1])+'</span></div>'
+     +'<div class="bl"><span class="bn">'+t.calcPorts+'</span><div class="bar-t"><span style="width:'+pw+'%"></span></div><span>'+r[2]+'</span></div></div>';
+  }).join("");
+}
+
+/* ---------- static text, language, theme ---------- */
+function renderStatic(){
+  var t=L();
+  $$("[data-i]").forEach(function(el){var v=t[el.getAttribute("data-i")];if(typeof v==="string")el.textContent=v});
+  $$("[data-ia]").forEach(function(el){var v=t[el.getAttribute("data-ia")];if(v)el.setAttribute("aria-label",v)});
+  $("#fRows").innerHTML=t.fRows.map(function(r){return '<tr><td><strong>'+r[0]+'</strong></td><td>'+r[1]+'</td><td>'+r[2]+'</td></tr>'}).join("");
+  $("#crit").innerHTML=t.crit.map(function(c,i){return '<div class="ccard rv t-'+TYPES[i]+'"><h3>'+c[0]+'</h3><p>'+c[1]+'</p></div>'}).join("");
+  $("#hybCards").innerHTML=t.hyb.map(function(c,i){return '<div class="card hc tilt t-'+TYPES[i]+'"><h3>'+c[0]+'</h3><p>'+c[1]+'</p></div>'}).join("");
+  $("#conList").innerHTML=t.con.map(function(c){return '<li><strong>'+c[0]+'</strong>'+c[1]+'</li>'}).join("");
+  $("#refList").innerHTML=t.refs.map(function(r){return '<li><div class="rt"><b>'+r[0]+'</b><span>'+r[1]+'</span></div><a class="btn small" href="'+r[2]+'" target="_blank" rel="noopener noreferrer">'+t.open+' &#8599;</a></li>'}).join("");
+  document.documentElement.lang=lang;
+}
+function applyLang(){
+  renderStatic();renderChapters();renderCmp();renderCalc();renderTabs();renderModes();simRender();setLog("");renderNew();
+}
+function isDark(){var a=document.documentElement.getAttribute("data-theme");if(a)return a==="dark";try{return matchMedia("(prefers-color-scheme: dark)").matches}catch(e){return false}}
+
+$("#langBtn").addEventListener("click",function(){lang=lang==="es"?"en":"es";try{localStorage.setItem("topo-lang",lang)}catch(e){}applyLang()});
+$("#nRange").addEventListener("input",renderCalc);
+
+/* ===================== v3: new features ===================== */
+function esc(s){return String(s)}
+function tkey(ty){return "t"+ty.charAt(0).toUpperCase()+ty.slice(1)}
+function cname(ty){return L()[tkey(ty)]}
+
+/* ---------- sound (optional, default off) ---------- */
+var SND={on:false,ctx:null};
+try{SND.on=localStorage.getItem("topo-snd")==="1"}catch(e){}
+function beep(f,d,type,vol){
+  if(!SND.on)return;
+  try{
+    if(!SND.ctx)SND.ctx=new (window.AudioContext||window.webkitAudioContext)();
+    var c=SND.ctx,o=c.createOscillator(),g=c.createGain(),t=c.currentTime;
+    o.type=type||"sine";o.frequency.value=f;g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(vol||0.07,t+0.01);g.gain.exponentialRampToValueAtTime(0.0001,t+d);
+    o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+d+0.02);
+  }catch(e){}
+}
+function sndBtn(){var b=$("#sndBtn");if(b){b.classList.toggle("on",SND.on);b.setAttribute("aria-pressed",SND.on?"true":"false");b.textContent=SND.on?"♪ ON":"♪ OFF"}}
+
+/* ---------- intro, gear, timeline, glossary ---------- */
+var GEAR_SVG=[
+ '<svg viewBox="0 0 160 100" aria-hidden="true"><defs><linearGradient id="gA" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFE3A0"/><stop offset="1" stop-color="#FF9A3C"/></linearGradient></defs><rect x="12" y="34" width="62" height="32" rx="16" fill="#2A3263" stroke="#FFB347" stroke-width="2"/><rect x="34" y="40" width="40" height="20" fill="#C8D2F0" opacity=".8"/><rect x="48" y="44" width="26" height="12" fill="#8D99C7"/><rect x="58" y="48" width="16" height="4" fill="url(#gA)"/><circle cx="36" cy="50" r="15" fill="none" stroke="#FFB347" stroke-width="2"/><circle cx="36" cy="50" r="10" fill="#C8D2F0"/><circle cx="36" cy="50" r="6" fill="#8D99C7"/><circle cx="36" cy="50" r="2.5" fill="url(#gA)"/><rect x="74" y="42" width="30" height="16" rx="3" fill="#3B4580"/><rect x="104" y="30" width="30" height="40" rx="6" fill="#FFB347"/><rect x="134" y="38" width="12" height="24" rx="3" fill="#FF6B4A"/><text x="119" y="54" text-anchor="middle" font-family="monospace" font-size="9" font-weight="700" fill="#2A1500">50 Ω</text></svg>',
+ '<svg viewBox="0 0 160 100" aria-hidden="true"><g fill="none" stroke-width="3.2" stroke-linecap="round"><path d="M6 24 q10 -9 20 0 t20 0 t20 0" stroke="#FF9A3C"/><path d="M6 36 q10 -9 20 0 t20 0 t20 0" stroke="#2EE6A6"/><path d="M6 48 q10 -9 20 0 t20 0 t20 0" stroke="#5B93FF"/><path d="M6 60 q10 -9 20 0 t20 0 t20 0" stroke="#B0825C"/></g><g fill="none" stroke-width="3.2" stroke-linecap="round" opacity=".6"><path d="M6 30 q10 9 20 0 t20 0 t20 0" stroke="#fff"/><path d="M6 42 q10 9 20 0 t20 0 t20 0" stroke="#fff"/><path d="M6 54 q10 9 20 0 t20 0 t20 0" stroke="#fff"/><path d="M6 66 q10 9 20 0 t20 0 t20 0" stroke="#fff"/></g><rect x="70" y="18" width="40" height="56" rx="5" fill="#C8D2F0" opacity=".88"/><rect x="100" y="74" width="18" height="10" rx="2" fill="#C8D2F0" opacity=".88"/><g fill="#F2B84B"><rect x="74" y="24" width="3" height="22"/><rect x="79" y="24" width="3" height="22"/><rect x="84" y="24" width="3" height="22"/><rect x="89" y="24" width="3" height="22"/><rect x="94" y="24" width="3" height="22"/><rect x="99" y="24" width="3" height="22"/><rect x="104" y="24" width="3" height="22"/></g><path d="M110 46 H146" stroke="#5B93FF" stroke-width="3"/><text x="90" y="64" text-anchor="middle" font-family="monospace" font-size="9" font-weight="700" fill="#1A2350">RJ-45</text></svg>',
+ '<svg viewBox="0 0 160 100" aria-hidden="true"><defs><linearGradient id="gF" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#5EE0FF"/><stop offset="1" stop-color="#B38BFF"/></linearGradient></defs><rect x="8" y="30" width="144" height="40" rx="20" fill="#26306A" stroke="#5B93FF" stroke-width="2"/><rect x="14" y="38" width="132" height="24" rx="12" fill="#3B4A93"/><path d="M14 50 L40 42 L70 58 L100 42 L130 58 L146 50" fill="none" stroke="url(#gF)" stroke-width="3" stroke-linejoin="round" style="filter:drop-shadow(0 0 5px #5EE0FF)"/><circle cx="14" cy="50" r="5" fill="#fff"/><circle cx="146" cy="50" r="5" fill="#fff"/></svg>',
+ '<svg viewBox="0 0 160 100" aria-hidden="true"><rect x="14" y="14" width="132" height="62" rx="5" fill="#1F7A59" stroke="#2EE6A6" stroke-width="2"/><rect x="24" y="24" width="30" height="30" rx="3" fill="#0B1230" stroke="#9AD9C2"/><path d="M30 30h18M30 36h18M30 42h18" stroke="#2EE6A6" stroke-width="2"/><rect x="66" y="24" width="24" height="18" rx="2" fill="#0B1230"/><rect x="100" y="24" width="38" height="14" rx="2" fill="#C8D2F0"/><rect x="100" y="42" width="38" height="14" rx="2" fill="#C8D2F0"/><g fill="#F2B84B"><rect x="22" y="76" width="5" height="14"/><rect x="31" y="76" width="5" height="14"/><rect x="40" y="76" width="5" height="14"/><rect x="49" y="76" width="5" height="14"/><rect x="58" y="76" width="5" height="14"/><rect x="67" y="76" width="5" height="14"/><rect x="76" y="76" width="5" height="14"/><rect x="85" y="76" width="5" height="14"/><rect x="94" y="76" width="5" height="14"/><rect x="103" y="76" width="5" height="14"/></g></svg>',
+ '<svg viewBox="0 0 160 100" aria-hidden="true"><rect x="10" y="30" width="140" height="42" rx="7" fill="#1F4F7A" stroke="#18B6F0" stroke-width="2"/><g fill="#0B1230"><rect x="20" y="50" width="12" height="14" rx="2"/><rect x="36" y="50" width="12" height="14" rx="2"/><rect x="52" y="50" width="12" height="14" rx="2"/><rect x="68" y="50" width="12" height="14" rx="2"/><rect x="84" y="50" width="12" height="14" rx="2"/><rect x="100" y="50" width="12" height="14" rx="2"/><rect x="116" y="50" width="12" height="14" rx="2"/><rect x="132" y="50" width="12" height="14" rx="2"/></g><g fill="#2EE6A6"><circle cx="26" cy="40" r="2.3"/><circle cx="42" cy="40" r="2.3"/><circle cx="58" cy="40" r="2.3"/><circle cx="74" cy="40" r="2.3"/></g><g fill="#FFC857"><circle cx="90" cy="40" r="2.3"/><circle cx="106" cy="40" r="2.3"/></g><g fill="#18B6F0"><circle cx="122" cy="40" r="2.3"/><circle cx="138" cy="40" r="2.3"/></g><text x="80" y="22" text-anchor="middle" font-family="monospace" font-size="9" fill="#9AD9F0">SWITCH · 8 puertos</text></svg>',
+ '<svg viewBox="0 0 160 100" aria-hidden="true"><g stroke="#E26BFF" stroke-width="4" stroke-linecap="round"><path d="M38 44 L26 14"/><path d="M122 44 L134 14"/></g><circle cx="26" cy="12" r="4" fill="#FF5C9A"/><circle cx="134" cy="12" r="4" fill="#FF5C9A"/><rect x="10" y="44" width="140" height="34" rx="8" fill="#5A2A7A" stroke="#E26BFF" stroke-width="2"/><g fill="#0B1230"><rect x="22" y="56" width="12" height="14" rx="2"/><rect x="40" y="56" width="12" height="14" rx="2"/><rect x="58" y="56" width="12" height="14" rx="2"/></g><g fill="#2EE6A6"><circle cx="100" cy="54" r="2.5"/><circle cx="110" cy="54" r="2.5"/></g><g stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M96 68 H124 M118 63 L124 68 L118 73"/><path d="M134 62 H106 M112 57 L106 62 L112 67" opacity=".6"/></g></svg>'
+];
+var GEAR_TY=["bus","star","ring","star","star","mesh"];
+function renderIntro(){
+  var t=L();
+  $("#objList").innerHTML=t.objs.map(function(o){return '<li><b>'+o[0]+'</b><span>'+o[1]+'</span></li>'}).join("");
+  $("#gearGrid").innerHTML=t.gear.map(function(g,i){return '<div class="gcard tilt t-'+GEAR_TY[i]+'">'+GEAR_SVG[i]+'<h3>'+g[0]+'</h3><p>'+g[1]+'</p></div>'}).join("");
+}
+function renderCred(){
+  var t=L();
+  $("#credList").innerHTML=t.cred.map(function(c){return '<div><dt>'+c[0]+'</dt><dd>'+c[1]+'</dd></div>'}).join("");
+}
+function renderTimeline(){
+  var t=L();
+  $("#tlList").innerHTML=t.timeline.map(function(e){return '<div class="tl-item rv t-'+e[3]+'"><span class="yr">'+e[0]+'</span><h3>'+e[1]+'</h3><p>'+e[2]+'</p></div>'}).join("");
+}
+function renderGlossary(){
+  var t=L(),q=($("#glQ").value||"").trim().toLowerCase();
+  var items=t.gl.filter(function(g){return !q||g[0].toLowerCase().indexOf(q)>=0||g[1].toLowerCase().indexOf(q)>=0});
+  $("#glList").innerHTML=items.length?items.map(function(g){return '<div><dt>'+g[0]+'</dt><dd>'+g[1]+'</dd></div>'}).join(""):'<p>'+t.glNone+'</p>';
+}
+function glossify(){
+  var t=L(),map={},alts=[];
+  t.glTerms.forEach(function(g){map[g[0].toLowerCase()]=g;alts.push(g[0].replace(/[.*+?^${}()|[\]\\\/]/g,"\\$&"))});
+  alts.sort(function(x,y){return y.length-x.length});
+  var re=new RegExp("(^|[^\\w/-])("+alts.join("|")+")(?![\\w/-])","gi");
+  $$("#chapters .ch-txt, #medios .gcard, #fundamentos .two > div:first-child").forEach(function(root){
+    var used={};
+    $$("p",root).forEach(function(p){
+      p.innerHTML=p.innerHTML.split(/(<[^>]+>)/).map(function(seg){
+        if(seg.charAt(0)==="<")return seg;
+        return seg.replace(re,function(m,pre,w){
+          var g=map[w.toLowerCase()];if(!g||used[g[0]])return m;used[g[0]]=1;
+          return pre+'<abbr class="gl" tabindex="0" data-d="'+t.gl[g[1]][1].replace(/"/g,"&quot;")+'">'+w+'</abbr>';
+        });
+      }).join("");
+    });
+  });
+}
+
+/* ---------- demo: paso a paso ---------- */
+var DEMO={tok:0,ty:null,timers:[]};
+function dsvgNS(tag,attrs){var e=document.createElementNS("http://www.w3.org/2000/svg",tag);for(var k in attrs)e.setAttribute(k,attrs[k]);return e}
+function linkPath(G,l,type){
+  var a=G.by[l.a],b=G.by[l.b];
+  if(type==="ring"&&l.kind==="lk"){return "M"+a.x+" "+a.y+" A"+G.R+" "+G.R+" 0 0 1 "+b.x+" "+b.y}
+  return "M"+a.x+" "+a.y+" L"+b.x+" "+b.y;
+}
+function demoBase(ty){
+  var svg=$("#dg-"+ty),W=400,H=300,G=layout(ty,W,H,{mesh:"full"}),s="";
+  svg.setAttribute("class","dg t-"+ty);
+  G.links.forEach(function(l){s+='<path class="lk'+(l.kind==="bb"?" bb":"")+'" data-l="'+l.id+'" d="'+linkPath(G,l,ty)+'"/>'});
+  G.nodes.forEach(function(nd){
+    if(nd.kind==="pc")s+='<g data-n="'+nd.id+'"><circle class="nd" cx="'+nd.x+'" cy="'+nd.y+'" r="15"/><text class="nt" x="'+nd.x+'" y="'+nd.y+'">'+(nd.idx+1)+'</text></g>';
+    else if(nd.kind==="hub")s+='<g data-n="'+nd.id+'"><rect class="hubr" x="'+(nd.x-24)+'" y="'+(nd.y-16)+'" width="48" height="32" rx="8"/><text class="ht" x="'+nd.x+'" y="'+nd.y+'">'+(nd.label||"SW")+'</text></g>';
+    else if(nd.kind==="tap")s+='<g data-n="'+nd.id+'"><circle class="tapd" cx="'+nd.x+'" cy="'+nd.y+'" r="4"/></g>';
+    else if(nd.kind==="term")s+='<g data-n="'+nd.id+'"><rect class="trm" x="'+(nd.x-3)+'" y="'+(nd.y-12)+'" width="6" height="24" rx="2"/><text class="trt" x="'+nd.x+'" y="'+(nd.y+26)+'">50 Ω</text></g>';
+  });
+  svg.innerHTML=s;
+  return {svg:svg,G:G};
+}
+function demoStop(){
+  DEMO.tok++;DEMO.timers.forEach(clearTimeout);DEMO.timers=[];
+  if(DEMO.ty){var b=$('[data-demo="'+DEMO.ty+'"]');if(b)b.textContent="▶ "+L().demoAgain}
+  DEMO.ty=null;
+}
+function demoRun(ty){
+  demoStop();
+  var tok=DEMO.tok,t=L(),D=demoBase(ty),svg=D.svg,G=D.G,lines=t.demo[ty],box=$('[data-dw="'+ty+'"]'),btn=$('[data-demo="'+ty+'"]');
+  DEMO.ty=ty;btn.textContent="■ "+t.demoStop;
+  var txt=$(".dtext",box),stp=$(".dstep",box),pr=$(".dprog",box),mac=$(".mac",box);
+  pr.innerHTML=lines.map(function(){return "<i></i>"}).join("");
+  mac.hidden=true;mac.innerHTML="";
+  function alive(){return tok===DEMO.tok}
+  function N(id){return $('[data-n="'+id+'"]',svg)}
+  function cls(id,c,on){var g=N(id);if(g)g.classList[on===false?"remove":"add"](c);var el=g&&g.firstElementChild;if(el&&(c==="hl"||c==="rx"||c==="bad"))el.classList[on===false?"remove":"add"](c)}
+  function lnk(id){return $('[data-l="'+id+'"]',svg)}
+  function lbetween(a,b){var l=G.links.filter(function(x){return (x.a===a&&x.b===b)||(x.a===b&&x.b===a)})[0];return l}
+  function wait(ms,cb){DEMO.timers.push(setTimeout(function(){if(alive())cb()},ms))}
+  function fly(a,b,o,cb){
+    o=o||{};var l=lbetween(a,b),el=lnk(l.id),rev=(l.a!==a),len=el.getTotalLength(),dur=o.dur||900;
+    var dot=dsvgNS("circle",{class:"dpk"+(o.c?" "+o.c:""),r:o.r||6});svg.appendChild(dot);el.classList.add("hot");
+    var t0=null;
+    function fr(ts){
+      if(!alive()){dot.remove();return}
+      if(t0===null)t0=ts;var p=Math.min(1,(ts-t0)/dur),q=rev?1-p:p,pt=el.getPointAtLength(len*q);
+      dot.setAttribute("cx",pt.x);dot.setAttribute("cy",pt.y);
+      if(p<1)requestAnimationFrame(fr);else{dot.remove();if(o.keep!==true)el.classList.remove("hot");beep(520+Math.random()*120,0.06,"triangle",0.04);if(cb)cb()}
+    }
+    requestAnimationFrame(fr);
+  }
+  function chain(ids,o,cb){var i=0;(function nx(){if(!alive())return;if(i>=ids.length-1){if(cb)cb();return}fly(ids[i],ids[i+1],o,function(){i++;nx()})})()}
+  function par(fns,cb){var n=fns.length,c=0;fns.forEach(function(f){f(function(){c++;if(c===n&&cb)cb()})})}
+  function say(i){txt.textContent=lines[i];stp.textContent=(lang==="es"?"Paso ":"Step ")+(i+1)+" / "+lines.length;$$("i",pr).forEach(function(x,j){x.classList.toggle("on",j<=i)});beep(660,0.12,"sine",0.05)}
+  function dim(ids,on){ids.forEach(function(id){var g=N(id);if(g)g.classList[on===false?"remove":"add"]("dim")})}
+  function flash(id){var g=N(id);if(g){g.classList.remove("flash");void g.getBoundingClientRect();g.classList.add("flash")}}
+  var steps=[];
+  var pcs=G.nodes.filter(function(n){return n.kind==="pc"}).map(function(n){return n.id});
+  if(ty==="bus"){
+    var tp=["T0","T1","T2","T3","T4","T5"];
+    steps=[
+      function(n){cls("N0","hl");wait(1900,n)},
+      function(n){par([function(d){fly("N0","T0",{dur:700},d)},],function(){par([function(d){fly("T0","E0",{dur:700},d)},function(d){chain(["T0","T1","T2","T3","T4","T5","E1"],{dur:360},d)}],n)})},
+      function(n){cls("N0","hl",false);cls("N3","rx");dim(["N1","N2","N4","N5"]);flash("N3");wait(2400,function(){dim(["N1","N2","N4","N5"],false);cls("N3","rx",false);n()})},
+      function(n){par([function(d){fly("N1","T1",{dur:600,c:"red"},d)},function(d){fly("N4","T4",{dur:600,c:"red"},d)}],function(){
+        var m=dsvgNS("text",{class:"boom",x:G.by.T2.x+30,y:G.by.T2.y-12});m.textContent="✕ collision";if(lang==="es")m.textContent="✕ colisión";svg.appendChild(m);beep(140,0.4,"sawtooth",0.07);
+        par([function(d){chain(["T1","T2","T3"],{dur:700,c:"red"},d)},function(d){chain(["T4","T3"],{dur:700,c:"red"},d)}],function(){wait(1300,function(){m.remove();n()})})})},
+      function(n){cls("N1","hl");wait(900,function(){chain(["N1","T1","T2","T3","N3"],{dur:520},function(){cls("N1","hl",false);flash("N3");wait(1000,n)})})}
+    ];
+  }else if(ty==="star"){
+    var rows=[];function addRow(i){rows.push(i);mac.hidden=false;mac.innerHTML='<b>'+t.macLbl+'</b>'+rows.map(function(r){return '<div><span>'+t.port+' '+(r+1)+'</span><span>→ '+t.pc+(r+1)+'</span></div>'}).join("")}
+    steps=[
+      function(n){cls("N0","hl");wait(1700,n)},
+      function(n){fly("N0","H",{dur:900},function(){addRow(0);flash("H");wait(900,n)})},
+      function(n){par(["N1","N2","N3","N4","N5"].map(function(id){return function(d){fly("H",id,{dur:800,c:"red"},d)}}),function(){dim(["N1","N2","N4","N5"]);cls("N3","rx");wait(1500,function(){dim(["N1","N2","N4","N5"],false);n()})})},
+      function(n){cls("N0","hl",false);cls("N3","rx",false);fly("N3","H",{dur:900},function(){addRow(3);flash("H");wait(900,n)})},
+      function(n){dim(["N1","N2","N4","N5"]);fly("H","N0",{dur:900},function(){flash("N0");wait(1600,function(){dim(["N1","N2","N4","N5"],false);n()})})}
+    ];
+  }else if(ty==="ring"){
+    var order=["N0","N1","N2","N3","N4","N5","N0"];
+    steps=[
+      function(n){chain(order,{dur:520,c:"tok",r:7},n)},
+      function(n){chain(["N0","N1"],{dur:700,c:"tok",r:7},function(){cls("N1","hl");wait(500,n)})},
+      function(n){chain(["N1","N2","N3","N4"],{dur:620},n)},
+      function(n){cls("N4","rx");flash("N4");wait(900,function(){chain(["N4","N5","N0","N1"],{dur:620},function(){cls("N4","rx",false);n()})})},
+      function(n){flash("N1");wait(800,function(){cls("N1","hl",false);chain(["N1","N2","N3"],{dur:560,c:"tok",r:7},n)})}
+    ];
+  }else if(ty==="mesh"){
+    steps=[
+      function(n){cls("N0","hl");fly("N0","N3",{dur:1300},function(){wait(500,n)})},
+      function(n){var l=lnk("L0_3");l.classList.add("bad");var m=dsvgNS("text",{class:"boom",x:(G.by.N0.x+G.by.N3.x)/2+22,y:(G.by.N0.y+G.by.N3.y)/2});m.textContent="✕";svg.appendChild(m);beep(150,0.35,"sawtooth",0.06);wait(2200,n)},
+      function(n){chain(["N0","N1","N3"],{dur:900},function(){flash("N3");cls("N3","rx");wait(600,n)})},
+      function(n){wait(2200,n)}
+    ];
+  }else{
+    steps=[
+      function(n){cls("N0","hl");fly("N0","S0",{dur:800},function(){wait(700,n)})},
+      function(n){flash("S0");fly("S0","C",{dur:900},function(){flash("C");wait(700,n)})},
+      function(n){fly("C","S1",{dur:800},function(){fly("S1","N5",{dur:800},function(){cls("N5","rx");flash("N5");wait(800,n)})})},
+      function(n){cls("N0","hl",false);cls("N5","rx",false);
+        cls("S0","bad");dim(["N0","N1","N2"]);wait(1900,function(){cls("S0","bad",false);dim(["N0","N1","N2"],false);cls("C","bad");dim(["S0","S1","N0","N1","N2","N3","N4","N5"]);beep(150,0.35,"sawtooth",0.06);wait(2200,function(){cls("C","bad",false);dim(["S0","S1","N0","N1","N2","N3","N4","N5"],false);n()})})}
+    ];
+  }
+  var i=0;
+  (function go(){
+    if(!alive())return;
+    if(i>=steps.length){demoEnd();return}
+    say(i);var k=i;i++;steps[k](function(){wait(350,go)});
+  })();
+  function demoEnd(){DEMO.ty=null;btn.textContent="↻ "+L().demoAgain}
+}
+
+/* ---------- lab: comparator / cost / reliability ---------- */
+var AB={a:"star",b:"mesh"};
+function dotsHtml(v,r){var d="";for(var i=1;i<=5;i++)d+='<i'+(i<=v?' class="on"':'')+'></i>';return '<span class="dots'+(r?" r":"")+'" role="img" aria-label="'+v+' / 5">'+d+'</span>'}
+function renderAB(){
+  var t=L();
+  function seg(w){return '<div class="seg">'+TYPES.map(function(ty){return '<button type="button" class="t-'+ty+'" data-ab="'+w+'" data-ty="'+ty+'" aria-pressed="'+(AB[w]===ty)+'">'+cname(ty)+'</button>'}).join("")+'</div>'}
+  var h='<div class="label">'+t.abA+'</div>'+seg("a")+'<div class="label">'+t.abB+'</div>'+seg("b");
+  h+='<div class="ab-top">';
+  CMP.forEach(function(r){h+='<div class="ab-row"><span class="t-'+AB.a+'">'+dotsHtml(r[1][AB.a])+'</span><span class="l">'+t.cmpRows[r[0]]+'</span><span class="t-'+AB.b+'">'+dotsHtml(r[1][AB.b],true)+'</span></div>'});
+  h+='</div>';
+  function best(ty,mx){var bi=0;CMP.forEach(function(r,i){if(mx?r[1][ty]>CMP[bi][1][ty]:r[1][ty]<CMP[bi][1][ty])bi=i});return t.cmpRows[CMP[bi][0]]+' · '+CMP[bi][1][ty]+'/5'}
+  h+='<div class="ab-sum"><div class="t-'+AB.a+'"><b>'+t.abPros+'</b>'+best(AB.a,true)+'</div><div class="t-'+AB.b+'"><b>'+t.abPros+'</b>'+best(AB.b,true)+'</div><div class="t-'+AB.a+'"><b>'+t.abCons+'</b>'+best(AB.a,false)+'</div><div class="t-'+AB.b+'"><b>'+t.abCons+'</b>'+best(AB.b,false)+'</div></div>';
+  $("#abBody").innerHTML=h;
+}
+var COST={n:12,d:15,pm:2500,pp:45000};
+function costRows(){
+  var n=COST.n,d=COST.d,u=Math.ceil(n/8);
+  return [["bus",n*d*1.5,n],["star",n*d,2*n],["ring",n*d,2*n],["mesh",n*(n-1)/2*d,n*(n-1)],["tree",(n+u)*d,2*n+2*u]];
+}
+function cop(v){try{return "$"+Math.round(v).toLocaleString("es-CO")}catch(e){return "$"+Math.round(v)}}
+function renderCost(){
+  var t=L(),rows=costRows().map(function(r){return {ty:r[0],m:r[1],p:r[2],tot:r[1]*COST.pm+r[2]*COST.pp}}),mx=Math.max.apply(null,rows.map(function(r){return r.tot}));
+  var h='<div class="field"><label for="cN">'+t.costN+': <b id="cNv">'+COST.n+'</b></label><span></span><input type="range" id="cN" min="4" max="40" value="'+COST.n+'"></div>'
+   +'<div class="field"><label for="cD">'+t.costD+'</label><input type="number" id="cD" min="1" max="200" value="'+COST.d+'"></div>'
+   +'<div class="field"><label for="cM">'+t.costP+'</label><input type="number" id="cM" min="0" step="100" value="'+COST.pm+'"></div>'
+   +'<div class="field"><label for="cP">'+t.costQ+'</label><input type="number" id="cP" min="0" step="1000" value="'+COST.pp+'"></div>'
+   +'<div id="costRows">'+rows.map(function(r){return '<div class="cost-row t-'+r.ty+'"><span class="nm">'+cname(r.ty)+'</span><div class="bar-t"><span style="width:'+Math.max(2,r.tot/mx*100)+'%"></span></div><span class="v">'+cop(r.tot)+'</span></div>'}).join("")+'</div>'
+   +'<p class="cost-note">'+t.costSub+'</p>';
+  $("#costBody").innerHTML=h;
+}
+function wireCost(){
+  var host=$("#costBody");
+  host.addEventListener("input",function(e){
+    var id=e.target.id,v=+e.target.value;
+    if(id==="cN"){COST.n=v;$("#cNv").textContent=v}else if(id==="cD")COST.d=Math.max(1,v||1);else if(id==="cM")COST.pm=Math.max(0,v||0);else if(id==="cP")COST.pp=Math.max(0,v||0);else return;
+    var rows=costRows().map(function(r){return {ty:r[0],tot:r[1]*COST.pm+r[2]*COST.pp}}),mx=Math.max.apply(null,rows.map(function(r){return r.tot}))||1;
+    $("#costRows").innerHTML=rows.map(function(r){return '<div class="cost-row t-'+r.ty+'"><span class="nm">'+cname(r.ty)+'</span><div class="bar-t"><span style="width:'+Math.max(2,r.tot/mx*100)+'%"></span></div><span class="v">'+cop(r.tot)+'</span></div>'}).join("");
+  });
+}
+var REL={p:8};
+function rng(seed){return function(){seed|=0;seed=seed+0x6D2B79F5|0;var t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function relRun(){
+  var cfgs=[["bus","bus",null],["star","star",null],["ring_single","ring","single"],["ring_dual","ring","dual"],["mesh_partial","mesh","partial"],["mesh_full","mesh","full"],["tree","tree",null]],out=[],p=REL.p/100,TR=1500;
+  cfgs.forEach(function(c,ci){
+    var st={type:c[1],ring:c[1]==="ring"?c[2]:"single",mesh:c[1]==="mesh"?c[2]:"full",nodes:{},links:{}},G=layout(c[1],600,400,{mesh:st.mesh}),r=rng(1234+ci*77),all=0,sum=0;
+    for(var k=0;k<TR;k++){
+      st.nodes={};st.links={};
+      G.links.forEach(function(l){if(r()<p)st.links[l.id]=1});
+      G.nodes.forEach(function(n){if(n.kind==="hub"&&r()<p/2)st.nodes[n.id]=1});
+      var A=analyze(G,st),u=cnt(A.up);sum+=u;if(u===6)all++;
+    }
+    out.push({k:c[0],ty:c[1]==="ring"?"ring":c[1]==="mesh"?"mesh":c[1],all:all/TR,avg:sum/TR});
+  });
+  return out;
+}
+function renderRel(){
+  var t=L(),res=relRun();
+  var h='<div class="rel-head"><div><h3>'+t.relTitle+'</h3><p class="sub" style="margin:4px 0 0;color:var(--muted);font-size:.9rem">'+t.relSub+'</p></div><div><span class="label">'+t.relP+'</span> <b id="relPv">'+REL.p+'%</b></div></div>'
+   +'<input type="range" id="relP" min="1" max="30" value="'+REL.p+'" style="width:100%;accent-color:var(--accent)" aria-label="'+t.relP+'">'
+   +'<div id="relRows"></div>';
+  $("#relBody").innerHTML=h;relRows(res);
+}
+function relRows(res){
+  var t=L();
+  $("#relRows").innerHTML=res.map(function(r){return '<div class="rel-row t-'+r.ty+'"><span>'+t.relCfg[r.k]+'<small>'+t.relAvg+': '+r.avg.toFixed(1)+' / 6</small></span><div class="bar-t"><span style="width:'+Math.max(1.5,r.all*100)+'%"></span></div><span class="v">'+Math.round(r.all*100)+'%</span></div>'}).join("");
+}
+
+/* ---------- learn: recommender + quiz ---------- */
+var RC={i:0,sc:[0,0,0,0,0],done:false};
+var QZ={i:0,s:0,ans:null,done:false};
+function renderRec(){
+  var t=L(),h='';
+  if(!RC.done){
+    var q=t.rec[RC.i];
+    h='<h3>'+t.recTitle+'</h3><div class="qn">'+t.recQn+' '+(RC.i+1)+' / '+t.rec.length+'</div><p style="margin:0;font-weight:600">'+q.q+'</p><div class="opts">'+q.a.map(function(a,j){return '<button type="button" data-ra="'+j+'">'+a[0]+'</button>'}).join("")+'</div>';
+  }else{
+    var mx=Math.max.apply(null,RC.sc),wi=RC.sc.indexOf(mx),ty=TYPES[wi],tot=RC.sc.reduce(function(a,b){return a+b},0)||1;
+    h='<h3>'+t.recTitle+'</h3><div class="rec-res"><div class="win t-'+ty+'"><h4>'+t.recResult+'</h4><strong>'+cname(ty)+'</strong><p>'+t.recWhy[ty]+'</p></div><div class="label">'+t.recScores+'</div>'
+     +TYPES.map(function(x,j){return '<div class="sc-row t-'+x+'"><span>'+cname(x)+'</span><div class="bar-t"><span style="width:'+Math.max(3,RC.sc[j]/mx*100)+'%"></span></div><span>'+Math.round(RC.sc[j]/tot*100)+'%</span></div>'}).join("")
+     +'</div><div class="row"><a class="btn small" href="#'+ty+'">'+t.recSee+'</a><button type="button" class="btn small" id="recReset">'+t.recReset+'</button></div>';
+  }
+  $("#recBody").innerHTML=h;
+}
+function renderQuiz(){
+  var t=L(),h='';
+  if(!QZ.done){
+    var q=t.quiz[QZ.i];
+    h='<h3>'+t.quizTitle+'</h3><div class="qn">'+t.recQn+' '+(QZ.i+1)+' / '+t.quiz.length+'</div><div class="dprog t-star">'+t.quiz.map(function(_,j){return '<i class="'+(j<=QZ.i?'on':'')+'"></i>'}).join("")+'</div><p style="margin:0;font-weight:600">'+q.q+'</p><div class="opts">'
+     +q.o.map(function(o,j){var c="";if(QZ.ans!==null){if(j===q.c)c="ok";else if(j===QZ.ans)c="no"}return '<button type="button" data-qa="'+j+'" class="'+c+'"'+(QZ.ans!==null?" disabled":"")+'>'+o+'</button>'}).join("")+'</div>';
+    if(QZ.ans!==null){h+='<p class="expl"><strong>'+(QZ.ans===q.c?t.quizOk:t.quizBad)+'</strong> '+q.e+'</p><div class="row"><button type="button" class="btn primary small" id="qNext">'+(QZ.i===t.quiz.length-1?t.quizFinish:t.quizNext)+'</button></div>'}
+  }else{
+    var n=t.quiz.length,m=QZ.s>=n-1?2:QZ.s>=Math.ceil(n/2)?1:0;
+    h='<h3>'+t.quizTitle+'</h3><div class="big">'+QZ.s+' / '+n+'</div><p style="margin:0">'+t.quizScore(QZ.s,n)+'. '+t.quizMsg[m]+'</p><div class="row"><button type="button" class="btn primary small" id="qAgain">'+t.quizAgain+'</button></div>';
+  }
+  $("#quizBody").innerHTML=h;
+}
+function wireLearn(){
+  $("#recBody").addEventListener("click",function(e){
+    var b=e.target.closest("[data-ra]");
+    if(b){var a=L().rec[RC.i].a[+b.getAttribute("data-ra")][1];a.forEach(function(v,j){RC.sc[j]+=v});beep(600,0.1);if(RC.i<L().rec.length-1)RC.i++;else RC.done=true;renderRec();return}
+    if(e.target.id==="recReset"){RC={i:0,sc:[0,0,0,0,0],done:false};renderRec()}
+  });
+  $("#quizBody").addEventListener("click",function(e){
+    var b=e.target.closest("[data-qa]");
+    if(b&&QZ.ans===null){QZ.ans=+b.getAttribute("data-qa");var ok=QZ.ans===L().quiz[QZ.i].c;if(ok)QZ.s++;beep(ok?880:180,ok?0.18:0.3,ok?"sine":"sawtooth",0.07);renderQuiz();return}
+    if(e.target.id==="qNext"){if(QZ.i<L().quiz.length-1){QZ.i++;QZ.ans=null}else QZ.done=true;renderQuiz();return}
+    if(e.target.id==="qAgain"){QZ={i:0,s:0,ans:null,done:false};renderQuiz()}
+  });
+}
+
+/* ---------- navigation: progress, dots, presentation mode ---------- */
+var SECS=[["inicio","brand"],["intro","nIntro"],["fundamentos","nFund"],["medios","nMedia"],["topologias","nTopo"],["simulador","nSim"],["laboratorio","nLab"],["comparativa","nCmp"],["hibridas","nHyb"],["historia","nHist"],["aprende","nLearn"],["glosario","nGloss"],["conclusiones","conLabel"],["fuentes","nSrc"]];
+var STOPS=["inicio","intro","fundamentos","medios","bus","star","ring","mesh","tree","simulador","laboratorio","comparativa","hibridas","historia","aprende","glosario","conclusiones","fuentes"];
+var PRES={on:false,i:0};
+function renderDots(){
+  var t=L();
+  $("#dotsNav").innerHTML=SECS.map(function(s){return '<a href="#'+s[0]+'" data-sec="'+s[0]+'" data-t="'+t[s[1]]+'" aria-label="'+t[s[1]]+'"></a>'}).join("");
+  scrollSpy();
+}
+function scrollSpy(){
+  var h=document.documentElement,max=h.scrollHeight-h.clientHeight,p=max>0?(window.pageYOffset||h.scrollTop)/max:0;
+  $("#prog").style.width=(p*100).toFixed(2)+"%";
+  var cur=SECS[0][0],y=window.innerHeight*0.38;
+  SECS.forEach(function(s){var el=document.getElementById(s[0]);if(el&&el.getBoundingClientRect().top<=y)cur=s[0]});
+  $$("#dotsNav a").forEach(function(a){a.classList.toggle("on",a.getAttribute("data-sec")===cur)});
+}
+function stopTitle(id){var el=document.getElementById(id),h=el&&el.querySelector("h2,h1");return h?h.textContent:id}
+function presGo(i){
+  PRES.i=Math.max(0,Math.min(STOPS.length-1,i));
+  var el=document.getElementById(STOPS[PRES.i]);if(el)el.scrollIntoView({behavior:"smooth",block:"start"});
+  hudUpdate();beep(440+PRES.i*18,0.12,"sine",0.05);
+}
+function hudUpdate(){$("#hudN").textContent=(PRES.i+1)+" / "+STOPS.length;$("#hudT").textContent=stopTitle(STOPS[PRES.i])}
+function presToggle(on){
+  PRES.on=on;document.body.classList.toggle("pres",on);$("#presBtn").classList.toggle("on",on);
+  if(on){var y=window.innerHeight*0.38,k=0;STOPS.forEach(function(id,j){var el=document.getElementById(id);if(el&&el.getBoundingClientRect().top<=y)k=j});PRES.i=k;hudUpdate()}
+}
+function wireNav(){
+  window.addEventListener("scroll",scrollSpy,{passive:true});window.addEventListener("resize",scrollSpy);
+  $("#presBtn").addEventListener("click",function(){presToggle(!PRES.on)});
+  $("#sndBtn").addEventListener("click",function(){SND.on=!SND.on;try{localStorage.setItem("topo-snd",SND.on?"1":"0")}catch(e){}sndBtn();beep(660,0.15)});
+  $("#hudPrev").addEventListener("click",function(){presGo(PRES.i-1)});
+  $("#hudNext").addEventListener("click",function(){presGo(PRES.i+1)});
+  $("#hudExit").addEventListener("click",function(){presToggle(false)});
+  document.addEventListener("keydown",function(e){
+    var tg=e.target&&e.target.tagName;if(tg==="INPUT"||tg==="TEXTAREA"||tg==="SELECT")return;
+    if(e.key==="p"||e.key==="P"){if(!e.ctrlKey&&!e.metaKey){presToggle(!PRES.on);return}}
+    if(!PRES.on)return;
+    if(e.key==="ArrowRight"||e.key==="ArrowDown"||e.key==="PageDown"||e.key===" "){e.preventDefault();presGo(PRES.i+1)}
+    else if(e.key==="ArrowLeft"||e.key==="ArrowUp"||e.key==="PageUp"){e.preventDefault();presGo(PRES.i-1)}
+    else if(e.key==="Escape")presToggle(false);
+  });
+  /* tilt */
+  document.addEventListener("pointermove",function(e){
+    var el=e.target.closest&&e.target.closest(".tilt");
+    $$(".tilt").forEach(function(x){if(x!==el){x.style.removeProperty("--rx");x.style.removeProperty("--ry")}});
+    if(!el)return;var r=el.getBoundingClientRect(),px=(e.clientX-r.left)/r.width-.5,py=(e.clientY-r.top)/r.height-.5;
+    el.style.setProperty("--ry",(px*9).toFixed(2)+"deg");el.style.setProperty("--rx",(-py*9).toFixed(2)+"deg");
+  });
+  /* demo + lab clicks */
+  document.addEventListener("click",function(e){
+    var d=e.target.closest("[data-demo]");if(d){var ty=d.getAttribute("data-demo");if(DEMO.ty===ty){demoStop();drawStatic($("#dg-"+ty),ty);$("#dg-"+ty).setAttribute("class","");return}demoRun(ty);return}
+    var a=e.target.closest("[data-ab]");if(a){AB[a.getAttribute("data-ab")]=a.getAttribute("data-ty");renderAB();return}
+  });
+  document.addEventListener("input",function(e){
+    if(e.target.id==="relP"){REL.p=+e.target.value;$("#relPv").textContent=REL.p+"%";relRows(relRun())}
+    if(e.target.id==="glQ")renderGlossary();
+  });
+}
+function renderNew(){
+  demoStop();
+  renderIntro();renderCred();renderTimeline();renderGlossary();renderAB();renderCost();renderRel();renderRec();renderQuiz();renderDots();glossify();sndBtn();
+  $$(".demo").forEach(function(box){var ty=box.getAttribute("data-dw");$("[data-demo]",box).textContent="▶ "+L().demoPlay;$(".dtext",box).textContent=L().demoHint});
+  if(PRES.on)hudUpdate();
+  $("#glQ").placeholder=L().glSearch;
+}
+
+/* ===== v3.1: credits, Spanish sources ===== */
+var MORE={
+ es:{bus:[["Lifeder","https://www.lifeder.com/topologia-de-bus/"],["Guru99","https://www.guru99.com/es/type-of-network-topology.html"]],
+  star:[["Lifeder","https://www.lifeder.com/topologia-en-estrella/"],["StudySmarter","https://www.studysmarter.es/resumenes/ingenieria/ingenieria-electrica/topologias-de-red/"]],
+  ring:[["Computer Weekly","https://www.computerweekly.com/es/definicion/Token-Ring"],["IONOS","https://www.ionos.com/es-us/digitalguide/servidores/know-how/token-ring/"]],
+  mesh:[["Lifeder","https://www.lifeder.com/topologia-de-malla/"],["NAKIVO","https://www.nakivo.com/es/blog/types-of-network-topology-explained/"]],
+  tree:[["Lenovo","https://www.lenovo.com/es/es/glossary/what-is-tree-topology/"],["IBM","https://ibm.com/mx-es/think/topics/network-topology"]]},
+ en:{bus:[["Wikipedia","https://en.wikipedia.org/wiki/Bus_network"]],star:[["Wikipedia","https://en.wikipedia.org/wiki/Star_network"]],ring:[["Wikipedia","https://en.wikipedia.org/wiki/Token_ring"]],mesh:[["Wikipedia","https://en.wikipedia.org/wiki/Mesh_networking"]],tree:[["Wikipedia","https://en.wikipedia.org/wiki/Network_topology"]]}
+};
+Object.assign(I.es,{
+ byline:"Corporación Unificada Nacional de Educación Superior · CUN",
+ credLabel:"Créditos",credTitle:"Autores y datos del trabajo",
+ cred:[["Autores","Epifanio Alberto Díaz Rodríguez<br>Andrés Felipe Niño<br>Sebastián Felipe Carrero"],["Docente","Danilo Andrés Rincón"],["Universidad","Corporación Unificada Nacional de Educación Superior (CUN)"],["Programa","Ingeniería de Sistemas"],["Asignatura","Cableado estructurado"],["Ficha","54448"]],
+ foot1:"CUN · Ingeniería de Sistemas · Cableado estructurado · Ficha 54448 · 2026-2",
+ foot2:"Epifanio Alberto Díaz Rodríguez, Andrés Felipe Niño y Sebastián Felipe Carrero · Docente: Danilo Andrés Rincón",
+ refs:[
+  ["Tipos de topología de red: bus, anillo, estrella, malla, árbol","Guru99. Descripción de siete topologías con ventajas y desventajas.","https://www.guru99.com/es/type-of-network-topology.html"],
+  ["¿Qué es la topología de red?","IBM. Estrella, anillo, malla, árbol, bus e híbrida; diferencia entre topología física y lógica.","https://ibm.com/mx-es/think/topics/network-topology"],
+  ["Tipos de topología de red explicados","NAKIVO. Topologías físicas y lógicas, con ventajas e inconvenientes de cada una.","https://www.nakivo.com/es/blog/types-of-network-topology-explained/"],
+  ["Topología de red","Computer Weekly. Definición con bus, estrella, anillo, malla (completa y parcial) y árbol.","https://www.computerweekly.com/es/definicion/Topologia-de-red"],
+  ["Arquitectura de redes: topologías físicas","BUAP. Apuntes con cinco topologías básicas y topologías híbridas, incluidos Token Ring y FDDI.","https://ecosistema.buap.mx/forms/files/dspace-38/RC_U1_arquitectura_LINEA_3.pdf"],
+  ["Redes de datos: topologías y control de transmisión","Facultad de Ingeniería, UNAM. Material de clase que compara malla, árbol, bus, estrella y anillo.","https://redes.fi-b.unam.mx/datos/pdf/clase2.pdf"],
+  ["Topología de bus","Lifeder. Ventajas y desventajas del bus.","https://www.lifeder.com/topologia-de-bus/"],
+  ["Topología en estrella","Lifeder. Cómo se conecta cada equipo a un nodo central, con ventajas y desventajas.","https://www.lifeder.com/topologia-en-estrella/"],
+  ["Topología de malla","Lifeder. Caminos alternos, tipos de malla, ventajas y desventajas.","https://www.lifeder.com/topologia-de-malla/"],
+  ["Token Ring","Computer Weekly. Funcionamiento del testigo y del estándar IEEE 802.5.","https://www.computerweekly.com/es/definicion/Token-Ring"],
+  ["Token Ring (IEEE 802.5)","IONOS. Anillo lógico sobre estrella física con unidades MAU.","https://www.ionos.com/es-us/digitalguide/servidores/know-how/token-ring/"],
+  ["¿Qué es la topología de árbol?","Lenovo. Estructura jerárquica con nodo raíz y niveles de nodos hijos.","https://www.lenovo.com/es/es/glossary/what-is-tree-topology/"],
+  ["Topologías de red","StudySmarter. Estrella, bus, anillo y malla con ejemplos de uso empresarial.","https://www.studysmarter.es/resumenes/ingenieria/ingenieria-electrica/topologias-de-red/"],
+  ["Curso de cableado estructurado","Material de curso en español. Normas ANSI/TIA/EIA-568, subsistemas y categorías de cable.","https://www.uazuay.edu.ec/sites/default/files/public/2022-01/cableado_estructurado.pdf"],
+  ["Videos explicativos sobre topologías","Búsqueda en YouTube con explicaciones animadas en español.","https://www.youtube.com/results?search_query=topologias+de+red+explicadas"]
+ ]
+});
+Object.assign(I.en,{
+ byline:"Corporación Unificada Nacional de Educación Superior · CUN",
+ credLabel:"Credits",credTitle:"Authors and project details",
+ cred:[["Authors","Epifanio Alberto Díaz Rodríguez<br>Andrés Felipe Niño<br>Sebastián Felipe Carrero"],["Instructor","Danilo Andrés Rincón"],["University","Corporación Unificada Nacional de Educación Superior (CUN)"],["Program","Systems Engineering"],["Course","Structured cabling"],["Class ID","54448"]],
+ foot1:"CUN · Systems Engineering · Structured cabling · Class 54448 · 2026-2",
+ foot2:"Epifanio Alberto Díaz Rodríguez, Andrés Felipe Niño and Sebastián Felipe Carrero · Instructor: Danilo Andrés Rincón"
+});
+wireCost();wireLearn();wireNav();
+
+wireSim();
+applyLang();
+heroNet();
+})();
+</script>
+
+</body>
+</html>
